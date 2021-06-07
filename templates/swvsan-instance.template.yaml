@@ -1,0 +1,338 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description:
+  This template deploys an EC2 instnace using the StarWind VSAN
+  Marketplace AMI in an existing VPC. It also creates a total of 3 Elastic Network
+  Interfaces (ENIs) and attaches them to the instance.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: Network configuration
+      Parameters:
+      - VPCID
+      - PrivateSubnet1ID
+      - PrivateSubnet2ID
+      - PrivateSubnet3ID
+    - Label:
+        default: Amazon EC2 configuration
+      Parameters:
+      - SWVSANEC2InstanceName
+      - WorkloadInstanceType
+      - SWVSANStorageVolumeSize
+      - KeyPairName
+    - Label:
+        default: AWS Quick Start configuration
+      Parameters:
+      - QSS3BucketName
+      - QSS3BucketRegion
+      - QSS3KeyPrefix
+    ParameterLabels:
+      KeyPairName:
+        default: SSH key name
+      PrivateSubnet1ID:
+        default: Private subnet 1 ID (For iSCSI ENI)
+      PrivateSubnet2ID:
+        default: Private subnet 2 ID (For Management ENI)
+      PrivateSubnet3ID:
+        default: Private subnet 3 ID (For Syncronization ENI)
+      QSS3BucketName:
+        default: Quick Start S3 bucket name
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket region
+      QSS3KeyPrefix:
+        default: Quick Start S3 key prefix
+      VPCID:
+        default: VPC ID
+      WorkloadInstanceType:
+        default: Workload servers instance type
+      SWVSANStorageVolumeSize:
+        default: Secondary EBS volume size
+      SWVSANEC2InstanceName:
+        default: StarWind VSAN Instance Name
+Parameters:
+  KeyPairName:
+    Description: Name of an existing EC2 key pair. The instance will launch with
+      this key pair.
+    Type: AWS::EC2::KeyPair::KeyName
+  PrivateSubnet1ID:
+    Description: ID of private subnet 1 in Availability Zone 1 for the workload (e.g.,
+      subnet-a0246dcd).
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2ID:
+    Description: ID of private subnet 2 in Availability Zone 1 for the workload (e.g.,
+      subnet-b1f432cd).
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet3ID:
+    Description: ID of private subnet 3 in Availability Zone 1 for the workload (e.g.,
+      subnet-b1f432cd).
+    Type: AWS::EC2::Subnet::Id
+  QSS3BucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Default: aws-quickstart
+    Description: S3 bucket name for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+  QSS3BucketRegion:
+    Default: 'us-east-1'
+    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
+    Type: String
+  QSS3KeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slash (/).
+    Default: quickstart-examples/
+    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
+      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
+      forward slash (/).
+    Type: String
+  VPCID:
+    Description: ID of your existing VPC for deployment.
+    Type: AWS::EC2::VPC::Id
+  WorkloadInstanceType:
+    AllowedValues:
+    - c5.12xlarge
+    - c5.18xlarge
+    - c5.24xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
+    - c5.metal
+    - c5d.18xlarge
+    - c5d.2xlarge
+    - c5d.4xlarge
+    - c5d.9xlarge
+    - c5n.18xlarge
+    - c5n.2xlarge
+    - c5n.4xlarge
+    - c5n.9xlarge
+    - c5n.metal
+    - d2.2xlarge
+    - d2.4xlarge
+    - d2.8xlarge
+    - f1.16xlarge
+    - g2.2xlarge
+    - g2.8xlarge
+    - g3.16xlarge
+    - g3.4xlarge
+    - g3.8xlarge
+    - g4dn.12xlarge
+    - g4dn.16xlarge
+    - g4dn.2xlarge
+    - g4dn.4xlarge
+    - g4dn.8xlarge
+    - h1.16xlarge
+    - h1.2xlarge
+    - h1.4xlarge
+    - h1.8xlarge
+    - hs1.8xlarge
+    - i2.2xlarge
+    - i2.4xlarge
+    - i2.8xlarge
+    - i3.16xlarge
+    - i3.2xlarge
+    - i3.4xlarge
+    - i3.8xlarge
+    - i3.metal
+    - i3en.12xlarge
+    - i3en.24xlarge
+    - i3en.2xlarge
+    - i3en.3xlarge
+    - i3en.6xlarge
+    - i3en.large
+    - i3en.metal
+    - i3en.xlarge
+    - m5.12xlarge
+    - m5.16xlarge
+    - m5.24xlarge
+    - m5.2xlarge
+    - m5.4xlarge
+    - m5.8xlarge
+    - m5.metal
+    - m5a.12xlarge
+    - m5a.16xlarge
+    - m5a.24xlarge
+    - m5a.2xlarge
+    - m5a.4xlarge
+    - m5a.8xlarge
+    - m5ad.12xlarge
+    - m5ad.24xlarge
+    - m5ad.2xlarge
+    - m5ad.4xlarge
+    - m5d.12xlarge
+    - m5d.16xlarge
+    - m5d.24xlarge
+    - m5d.2xlarge
+    - m5d.4xlarge
+    - m5d.8xlarge
+    - m5d.metal
+    - m5dn.12xlarge
+    - m5dn.16xlarge
+    - m5dn.24xlarge
+    - m5dn.2xlarge
+    - m5dn.4xlarge
+    - m5dn.8xlarge
+    - m5n.12xlarge
+    - m5n.16xlarge
+    - m5n.24xlarge
+    - m5n.2xlarge
+    - m5n.4xlarge
+    - m5n.8xlarge
+    - p2.16xlarge
+    - p2.8xlarge
+    - p3.16xlarge
+    - p3.2xlarge
+    - p3.8xlarge
+    - p3dn.24xlarge
+    - r5.12xlarge
+    - r5.16xlarge
+    - r5.24xlarge
+    - r5.2xlarge
+    - r5.4xlarge
+    - r5.8xlarge
+    - r5.metal
+    - r5a.12xlarge
+    - r5a.16xlarge
+    - r5a.24xlarge
+    - r5a.2xlarge
+    - r5a.4xlarge
+    - r5a.8xlarge
+    - r5ad.12xlarge
+    - r5ad.24xlarge
+    - r5ad.2xlarge
+    - r5ad.4xlarge
+    - r5d.12xlarge
+    - r5d.16xlarge
+    - r5d.24xlarge
+    - r5d.2xlarge
+    - r5d.4xlarge
+    - r5d.8xlarge
+    - r5d.metal
+    - r5dn.12xlarge
+    - r5dn.16xlarge
+    - r5dn.24xlarge
+    - r5dn.2xlarge
+    - r5dn.4xlarge
+    - r5dn.8xlarge
+    - r5n.12xlarge
+    - r5n.16xlarge
+    - r5n.24xlarge
+    - r5n.2xlarge
+    - r5n.4xlarge
+    - r5n.8xlarge
+    - t3.2xlarge
+    - t3a.2xlarge
+    - x1.16xlarge
+    - x1.32xlarge
+    - x1e.16xlarge
+    - x1e.2xlarge
+    - x1e.32xlarge
+    - x1e.4xlarge
+    - x1e.8xlarge
+    - z1d.12xlarge
+    - z1d.2xlarge
+    - z1d.3xlarge
+    - z1d.6xlarge
+    - z1d.metal
+    ConstraintDescription: Must contain valid instance type
+    Default: m5.2xlarge
+    Description: Type of EC2 instance for the workload instances.
+    Type: String
+  SWVSANStorageVolumeSize:
+    Type: Number
+    Default: 100
+    ConstraintDescription: Must be between 1 GB and 16,000 GB (16 TB)
+    MinValue: 1
+    MaxValue: 16000
+    Description: Size for SarWind VSAN virtualized storage in GBs
+  SWVSANEC2InstanceName:
+    Type: String
+    Default: StarWind Node X
+Rules:
+  KeyPairsNotEmpty:
+    Assertions:
+    - Assert:
+        Fn::Not:
+        - Fn::EachMemberEquals:
+          - Fn::RefAll: AWS::EC2::KeyPair::KeyName
+          - ''
+      AssertDescription: All key pair parameters must not be empty
+  SubnetsInVPC:
+    Assertions:
+    - Assert:
+        Fn::EachMemberIn:
+        - Fn::ValueOfAll:
+          - AWS::EC2::Subnet::Id
+          - VpcId
+        - Fn::RefAll: AWS::EC2::VPC::Id
+      AssertDescription: All subnets must be in the VPC
+Mappings:
+  AWSAMIRegionMap:
+    AMI:
+      VSANWIN2019: swvsanhourly19_(Marketplace)-dd610325-87ae-42ca-8061-0ce75fb9e174-ami-0f2a0c97fbbcac4df.4
+    ap-northeast-1:
+      VSANWIN2019: ami-0201dda502a86878a
+    ap-northeast-2:
+      VSANWIN2019: ami-02048526fb424985f
+    ap-south-1:
+      VSANWIN2019: ami-0785c7f0867fdb89b
+    ap-southeast-1:
+      VSANWIN2019: ami-08b820b2db28bd152
+    ap-southeast-2:
+      VSANWIN2019: ami-0d6029ac0b5c859c9
+    ca-central-1:
+      VSANWIN2019: ami-0fbc5c52fb9e68f51
+    eu-central-1:
+      VSANWIN2019: ami-07a8af581e68fffa6
+    eu-west-1:
+      VSANWIN2019: ami-02cc88ff9e5245160
+    eu-west-2:
+      VSANWIN2019: ami-09353f86f59556db7
+    sa-east-1:
+      VSANWIN2019: ami-03b398cd42ffc1103
+    us-east-1:
+      VSANWIN2019: ami-0a9d7059c21ce60da
+    us-east-2:
+      VSANWIN2019: ami-09a7a26385b8153aa
+    us-west-1:
+      VSANWIN2019: ami-0a9e24330eca7ea7f
+    us-west-2:
+      VSANWIN2019: ami-0aff346fe0fe591b2
+Conditions:
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+Resources:
+  SWVSANEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", VSANWIN2019]
+      InstanceType: !Ref WorkloadInstanceType
+      KeyName: !Ref KeyPairName
+      BlockDeviceMappings:
+      - DeviceName: /dev/sdf
+        Ebs:
+          VolumeSize: !Ref SWVSANStorageVolumeSize
+      Tags:
+        - Key: Name
+          Value: !Ref SWVSANEC2InstanceName
+      NetworkInterfaces:
+        - Description: Management/Witness ENI
+          DeviceIndex: 0
+          # GroupSet:
+          #   - String
+          # PrivateIpAddress: PrivateIpAddress
+          SubnetId: !Ref PrivateSubnet2ID
+        - Description: iSCSI ENI
+          DeviceIndex: 1
+          # GroupSet:
+          #   - String
+          # PrivateIpAddress: PrivateIpAddress
+          SubnetId: !Ref PrivateSubnet1ID
+        - Description: Syncronization ENI
+          DeviceIndex: 2
+          # GroupSet:
+          #   - String
+          # PrivateIpAddress: PrivateIpAddress
+          SubnetId: !Ref PrivateSubnet3ID
