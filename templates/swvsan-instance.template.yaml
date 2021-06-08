@@ -319,19 +319,19 @@ Resources:
           Value: !Ref SWVSANEC2InstanceName
       NetworkInterfaces:
         - Description: Management/Witness ENI
-          DeviceIndex: 0
+          DeviceIndex: "0"
           # GroupSet:
           #   - String
           # PrivateIpAddress: PrivateIpAddress
           SubnetId: !Ref PrivateSubnet2ID
         - Description: iSCSI ENI
-          DeviceIndex: 1
+          DeviceIndex: "1"
           # GroupSet:
           #   - String
           # PrivateIpAddress: PrivateIpAddress
           SubnetId: !Ref PrivateSubnet1ID
         - Description: Syncronization ENI
-          DeviceIndex: 2
+          DeviceIndex: "2"
           # GroupSet:
           #   - String
           # PrivateIpAddress: PrivateIpAddress
