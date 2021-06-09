@@ -33,9 +33,9 @@ Metadata:
       PrivateSubnet1ID:
         default: Private subnet 1 ID (For iSCSI ENI)
       PrivateSubnet2ID:
-        default: Private subnet 2 ID (For Management ENI)
+        default: Private subnet 2 ID (For Management ENI, Ignored for Witness)
       PrivateSubnet3ID:
-        default: Private subnet 3 ID (For Syncronization ENI)
+        default: Private subnet 3 ID (For Syncronization ENI, , Ignored for Witness)
       QSS3BucketName:
         default: Quick Start S3 bucket name
       QSS3BucketRegion:
