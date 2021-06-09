@@ -278,8 +278,7 @@ Parameters:
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
-  Node1Stack:
-    # DependsOn: VPCStack
+  StorageNode1Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL:
@@ -310,3 +309,65 @@ Resources:
           !Ref SWVSANStorageVolumeSize
         SWVSANEC2InstanceName:
           "StarWind Node 1"
+  StorageNode2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/swvsan-instance.template.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        WorkloadInstanceType:
+          !Ref WorkloadInstanceType
+        KeyPairName:
+          !Ref KeyPairName
+        VPCID:
+          !Ref VPCID
+        PrivateSubnet1ID:
+          !Ref PrivateSubnet1BID
+        PrivateSubnet2ID:
+          !Ref PrivateSubnet2BID
+        PrivateSubnet3ID:
+          !Ref PrivateSubnet3BID
+        QSS3BucketName:
+          !Ref QSS3BucketName
+        QSS3BucketRegion:
+          !Ref QSS3BucketRegion
+        QSS3KeyPrefix:
+          !Ref QSS3KeyPrefix
+        SWVSANStorageVolumeSize:
+          !Ref SWVSANStorageVolumeSize
+        SWVSANEC2InstanceName:
+          "StarWind Node 2"
+  WitnessNodeStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/swvsan-instance.template.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        WorkloadInstanceType:
+          !Ref WorkloadInstanceType
+        KeyPairName:
+          !Ref KeyPairName
+        VPCID:
+          !Ref VPCID
+        PrivateSubnet1ID:
+          !Ref PrivateSubnet1CID
+        PrivateSubnet2ID:
+          !Ref PrivateSubnet1CID
+        PrivateSubnet3ID:
+          !Ref PrivateSubnet1CID
+        QSS3BucketName:
+          !Ref QSS3BucketName
+        QSS3BucketRegion:
+          !Ref QSS3BucketRegion
+        QSS3KeyPrefix:
+          !Ref QSS3KeyPrefix
+        SWVSANStorageVolumeSize:
+          !Ref SWVSANStorageVolumeSize
+        SWVSANEC2InstanceName:
+          "StarWind Witness"
