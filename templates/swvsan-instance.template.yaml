@@ -52,6 +52,14 @@ Metadata:
         default: StarWind VSAN Instance Name
       NodeOrWitness:
         default: Storage Node or Witness
+  AWSAMIRegionMap:
+    Filters:
+      VSANWIN2019:
+        description: "swvsanhourly19_(Marketplace)"
+        owner-id: "679593333241"
+      VSANWIN2016:
+        description: "swvsanhourly16_(Marketplace)"
+        owner-id: "679593333241"
 Parameters:
   KeyPairName:
     Description: Name of an existing EC2 key pair. The instance will launch with
@@ -281,36 +289,48 @@ Rules:
       AssertDescription: All subnets must be in the VPC
 Mappings:
   AWSAMIRegionMap:
-    AMI:
-      VSANWIN2019: swvsanhourly19_(Marketplace)-dd610325-87ae-42ca-8061-0ce75fb9e174-ami-0f2a0c97fbbcac4df.4
     ap-northeast-1:
       VSANWIN2019: ami-0201dda502a86878a
+      VSANWIN2016: ami-098b1f8c9a38223e2
     ap-northeast-2:
       VSANWIN2019: ami-02048526fb424985f
+      VSANWIN2016: ami-0cf63dc40f791c584
     ap-south-1:
       VSANWIN2019: ami-0785c7f0867fdb89b
+      VSANWIN2016: ami-0e6d64b76bb6e8942
     ap-southeast-1:
       VSANWIN2019: ami-08b820b2db28bd152
+      VSANWIN2016: ami-0165b63db7cf72a58
     ap-southeast-2:
       VSANWIN2019: ami-0d6029ac0b5c859c9
+      VSANWIN2016: ami-0ee9fb19795d9f75d
     ca-central-1:
       VSANWIN2019: ami-0fbc5c52fb9e68f51
+      VSANWIN2016: ami-050d944a84d74ca19
     eu-central-1:
       VSANWIN2019: ami-07a8af581e68fffa6
+      VSANWIN2016: ami-0dc3d6f78505eb09f
     eu-west-1:
       VSANWIN2019: ami-02cc88ff9e5245160
+      VSANWIN2016: ami-0dc12011a64bfa637
     eu-west-2:
       VSANWIN2019: ami-09353f86f59556db7
+      VSANWIN2016: ami-0ef8084cd5e1fbaae
     sa-east-1:
       VSANWIN2019: ami-03b398cd42ffc1103
+      VSANWIN2016: ami-0c4dd65edd550991f
     us-east-1:
       VSANWIN2019: ami-0a9d7059c21ce60da
+      VSANWIN2016: ami-0d30dc03c99322549
     us-east-2:
       VSANWIN2019: ami-09a7a26385b8153aa
+      VSANWIN2016: ami-02c27155e49b40cf9
     us-west-1:
       VSANWIN2019: ami-0a9e24330eca7ea7f
+      VSANWIN2016: ami-0ec023b0247c4fe58
     us-west-2:
       VSANWIN2019: ami-0aff346fe0fe591b2
+      VSANWIN2016: ami-002085dff485ed331
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   IsStorageNode: !Equals [!Ref NodeOrWitness, 'Storage Node']
