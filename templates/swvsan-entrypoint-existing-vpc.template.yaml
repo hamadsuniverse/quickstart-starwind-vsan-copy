@@ -67,33 +67,33 @@ Parameters:
     Description: ID of your existing VPC for deployment.
     Type: AWS::EC2::VPC::Id
   PrivateSubnet1AID:
-    Description: ID of private subnet 1 in Availability Zone 1 for the first
-      node (e.g., subnet-a0246dcd).
+    Description: ID of private subnet 1 in Availability Zone 1 for iSCSI ENI
+      for the first node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet2AID:
-    Description: ID of private subnet 2 in Availability Zone 1 for the first
-      node (e.g., subnet-a0246dcd).
+    Description: ID of private subnet 2 in Availability Zone 1 for management ENI
+      for the first node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet3AID:
-    Description: ID of private subnet 3 in Availability Zone 1 for the first
-      node (e.g., subnet-a0246dcd).
+    Description: ID of private subnet 3 in Availability Zone 1 for syncronization ENI
+      for the first node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
 
   PrivateSubnet1BID:
-    Description: ID of private subnet 1 in Availability Zone 2 for the second
-      node (e.g., subnet-a0246dcd).
+    Description: ID of private subnet 1 in Availability Zone 2 for iSCSI ENI
+      for the second node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet2BID:
-    Description: ID of private subnet 2 in Availability Zone 2 for the second
-      node (e.g., subnet-a0246dcd).
+    Description: ID of private subnet 2 in Availability Zone 2 for management ENI
+      for the second node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet3BID:
-    Description: ID of private subnet 3 in Availability Zone 2 for the second
-      node (e.g., subnet-a0246dcd).
+    Description: ID of private subnet 3 in Availability Zone 2 for syncronization ENI
+      for the second node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
 
   PrivateSubnet1CID:
-    Description: ID of private subnet in Availability Zone 3 for the witness (e.g.,
+    Description: ID of private subnet in Availability Zone 3 for the witness management ENI (e.g.,
       subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   QSS3BucketName:
@@ -264,17 +264,17 @@ Parameters:
     - z1d.3xlarge
     - z1d.6xlarge
     - z1d.metal
-    ConstraintDescription: Must contain valid instance type
+    ConstraintDescription: Must contain a valid instance type.
     Default: m5.2xlarge
     Description: Type of EC2 instance for the workload instances.
     Type: String
   SWVSANStorageVolumeSize:
     Type: Number
     Default: 100
-    ConstraintDescription: Must be between 1 GB and 16,000 GB (16 TB)
+    ConstraintDescription: Must be between 1 GB and 16,000 GB (16 TB).
     MinValue: 1
     MaxValue: 16000
-    Description: Size for SarWind VSAN virtualized storage in GBs
+    Description: Size for SarWind VSAN virtualized storage in GBs.
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
@@ -308,7 +308,7 @@ Resources:
         SWVSANStorageVolumeSize:
           !Ref SWVSANStorageVolumeSize
         SWVSANEC2InstanceName:
-          "StarWind Node 1"
+          'StarWind Node 1'
   StorageNode2Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -339,7 +339,7 @@ Resources:
         SWVSANStorageVolumeSize:
           !Ref SWVSANStorageVolumeSize
         SWVSANEC2InstanceName:
-          "StarWind Node 2"
+          'StarWind Node 2'
   WitnessNodeStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -371,4 +371,4 @@ Resources:
         SWVSANStorageVolumeSize:
           !Ref SWVSANStorageVolumeSize
         SWVSANEC2InstanceName:
-          "StarWind Witness"
+          'StarWind Witness'

@@ -31,11 +31,11 @@ Metadata:
       KeyPairName:
         default: SSH key name
       PrivateSubnet1ID:
-        default: Private subnet 1 ID (For iSCSI ENI)
+        default: Private subnet 1 ID
       PrivateSubnet2ID:
-        default: Private subnet 2 ID (For Management ENI, Ignored for Witness)
+        default: Private subnet 2 ID
       PrivateSubnet3ID:
-        default: Private subnet 3 ID (For Syncronization ENI, , Ignored for Witness)
+        default: Private subnet 3 ID
       QSS3BucketName:
         default: Quick Start S3 bucket name
       QSS3BucketRegion:
@@ -45,36 +45,36 @@ Metadata:
       VPCID:
         default: VPC ID
       WorkloadInstanceType:
-        default: Workload servers instance type
+        default: Workload instance type
       SWVSANStorageVolumeSize:
         default: Secondary EBS volume size
       SWVSANEC2InstanceName:
-        default: StarWind VSAN Instance Name
+        default: StarWind VSAN instance name
       NodeOrWitness:
         default: Storage Node or Witness
   AWSAMIRegionMap:
     Filters:
       VSANWIN2019:
-        description: "swvsanhourly19_(Marketplace)"
-        owner-id: "679593333241"
+        description: 'swvsanhourly19_(Marketplace)'
+        owner-id: '679593333241'
       VSANWIN2016:
-        description: "swvsanhourly16_(Marketplace)"
-        owner-id: "679593333241"
+        description: 'swvsanhourly16_(Marketplace)'
+        owner-id: '679593333241'
 Parameters:
   KeyPairName:
     Description: Name of an existing EC2 key pair. The instance will launch with
       this key pair.
     Type: AWS::EC2::KeyPair::KeyName
   PrivateSubnet1ID:
-    Description: ID of private subnet 1 in Availability Zone 1 for the workload (e.g.,
+    Description: (Ignored for Witness) ID of private subnet 1 in Availability Zone 1 used for iSCSI ENI (e.g.,
       subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet2ID:
-    Description: ID of private subnet 2 in Availability Zone 1 for the workload (e.g.,
+    Description: ID of private subnet 2 in Availability Zone 1 for management/witness ENI (e.g.,
       subnet-b1f432cd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet3ID:
-    Description: ID of private subnet 3 in Availability Zone 1 for the workload (e.g.,
+    Description: (Ignored for Witness) ID of private subnet 3 in Availability Zone 1 for syncronization ENI (e.g.,
       subnet-b1f432cd).
     Type: AWS::EC2::Subnet::Id
   QSS3BucketName:
@@ -248,23 +248,23 @@ Parameters:
     - z1d.3xlarge
     - z1d.6xlarge
     - z1d.metal
-    ConstraintDescription: Must contain valid instance type
+    ConstraintDescription: Must contain valid instance type.
     Default: m5.2xlarge
     Description: Type of EC2 instance for the workload instances.
     Type: String
   SWVSANStorageVolumeSize:
     Type: Number
     Default: 100
-    ConstraintDescription: Must be between 1 GB and 16,000 GB (16 TB)
+    ConstraintDescription: Must be between 1 GB and 16,000 GB (16 TB).
     MinValue: 1
     MaxValue: 16000
-    Description: Size for SarWind VSAN virtualized storage in GBs
+    Description: Size of StarWind VSAN virtualized storage in GBs.
   SWVSANEC2InstanceName:
     Type: String
     Default: StarWind Node X
   NodeOrWitness:
     Type: String
-    Description: The type of the StarWind instance to be created, a storage node or a witness.
+    Description: Type of the StarWind instance to be created.
     Default: Storage Node
     AllowedValues:
       - Storage Node
@@ -277,7 +277,7 @@ Rules:
         - Fn::EachMemberEquals:
           - Fn::RefAll: AWS::EC2::KeyPair::KeyName
           - ''
-      AssertDescription: All key pair parameters must not be empty
+      AssertDescription: All key pair parameters must not be empty.
   SubnetsInVPC:
     Assertions:
     - Assert:
@@ -286,7 +286,7 @@ Rules:
           - AWS::EC2::Subnet::Id
           - VpcId
         - Fn::RefAll: AWS::EC2::VPC::Id
-      AssertDescription: All subnets must be in the VPC
+      AssertDescription: All subnets must be in the VPC.
 Mappings:
   AWSAMIRegionMap:
     ap-northeast-1:
@@ -338,7 +338,7 @@ Resources:
   SWVSANEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", VSANWIN2019]
+      ImageId: !FindInMap [AWSAMIRegionMap, !Ref 'AWS::Region', VSANWIN2019]
       InstanceType: !Ref WorkloadInstanceType
       KeyName: !Ref KeyPairName
       BlockDeviceMappings:
@@ -348,13 +348,13 @@ Resources:
             DeviceName: /dev/sdf
             Ebs:
               VolumeSize: !Ref SWVSANStorageVolumeSize
-          - !Ref "AWS::NoValue"
+          - !Ref 'AWS::NoValue'
       Tags:
         - Key: Name
           Value: !Ref SWVSANEC2InstanceName
       NetworkInterfaces:
         - Description: Management/Witness ENI
-          DeviceIndex: "0"
+          DeviceIndex: '0'
           # GroupSet:
           #   - String
           # PrivateIpAddress: PrivateIpAddress
@@ -363,19 +363,19 @@ Resources:
             - IsStorageNode
             -
               Description: iSCSI ENI
-              DeviceIndex: "1"
+              DeviceIndex: '1'
               # GroupSet:
               #   - String
               # PrivateIpAddress: PrivateIpAddress
               SubnetId: !Ref PrivateSubnet1ID
-            - !Ref "AWS::NoValue"
+            - !Ref 'AWS::NoValue'
         - !If
             - IsStorageNode
             -
               Description: Syncronization ENI
-              DeviceIndex: "2"
+              DeviceIndex: '2'
               # GroupSet:
               #   - String
               # PrivateIpAddress: PrivateIpAddress
               SubnetId: !Ref PrivateSubnet3ID
-            - !Ref "AWS::NoValue"
+            - !Ref 'AWS::NoValue'
