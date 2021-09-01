@@ -26,3 +26,8 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+### CFN Testing ###
+# local taskcat files and folders
+taskcat_outputs
+.taskcat
