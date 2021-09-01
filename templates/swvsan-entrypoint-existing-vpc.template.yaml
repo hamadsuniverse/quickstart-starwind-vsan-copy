@@ -250,6 +250,76 @@ Parameters:
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
+  SWVSANSSMIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:SignalResource
+                Resource: !Sub 'arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*'
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeInstances
+                  - ec2:DescribeInstanceStatus
+                  - ssm:*
+                Resource: '*'
+          PolicyName: QS-SWVSAN-SSM-AutomationExecution
+      Path: /
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - ssm.amazonaws.com
+            Effect: Allow
+        Version: '2012-10-17'
+  SWVSANEC2IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:StartAutomationExecution
+                Resource: '*'
+          PolicyName: QS-SWVSAN-SSM-Trigger
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${SWVSANSSMIAMRole}'
+          PolicyName: QS-SWVSAN-SSM-PassRole
+      Path: /
+      ManagedPolicyArns:
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonEC2ReadOnlyAccess'
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - ssm.amazonaws.com
+            Effect: Allow
+        Version: '2012-10-17'
+  SWVSANEC2IAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref 'SWVSANEC2IAMRole'
+      Path: /
   StorageNode1Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -277,6 +347,8 @@ Resources:
           !Ref SWVSANStorageVolumeSize
         SWVSANEC2InstanceName:
           'StarWind Node 1'
+        SWVSANEC2IAMInstanceProfile:
+          !Ref SWVSANEC2IAMInstanceProfile
   StorageNode2Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -304,6 +376,8 @@ Resources:
           !Ref SWVSANStorageVolumeSize
         SWVSANEC2InstanceName:
           'StarWind Node 2'
+        SWVSANEC2IAMInstanceProfile:
+          !Ref SWVSANEC2IAMInstanceProfile
   WitnessNodeStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -332,3 +406,5 @@ Resources:
           !Ref SWVSANStorageVolumeSize
         SWVSANEC2InstanceName:
           'StarWind Witness'
+        SWVSANEC2IAMInstanceProfile:
+          !Ref SWVSANEC2IAMInstanceProfile

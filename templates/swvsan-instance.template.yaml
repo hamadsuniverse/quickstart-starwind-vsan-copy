@@ -22,6 +22,7 @@ Metadata:
       - WorkloadInstanceType
       - SWVSANStorageVolumeSize
       - KeyPairName
+      - SWVSANEC2IAMInstanceProfile
     - Label:
         default: AWS Quick Start configuration
       Parameters:
@@ -55,6 +56,8 @@ Metadata:
         default: StarWind VSAN instance name
       NodeOrWitness:
         default: Storage Node or Witness
+      SWVSANEC2IAMInstanceProfile:
+        default: IAM Instance Profile
   AWSAMIRegionMap:
     Filters:
       VSANWIN2019:
@@ -279,6 +282,9 @@ Parameters:
     AllowedValues:
       - Storage Node
       - Witness
+  SWVSANEC2IAMInstanceProfile:
+    Type: String
+    Description: IAM Instance Profile to be used for the node/witness.
 Rules:
   KeyPairsNotEmpty:
     Assertions:
@@ -354,6 +360,7 @@ Resources:
       ImageId: !FindInMap [AWSAMIRegionMap, !Ref 'AWS::Region', VSANWIN2019]
       InstanceType: !Ref WorkloadInstanceType
       KeyName: !Ref KeyPairName
+      IamInstanceProfile: !Ref 'SWVSANEC2IAMInstanceProfile'
       BlockDeviceMappings:
       - !If
           - IsStorageNode
