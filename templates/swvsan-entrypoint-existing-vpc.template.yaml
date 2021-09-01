@@ -11,13 +11,9 @@ Metadata:
         default: VPC configuration
       Parameters:
       - VPCID
-      - PrivateSubnet1AID
-      - PrivateSubnet2AID
-      - PrivateSubnet3AID
-      - PrivateSubnet1BID
-      - PrivateSubnet2BID
-      - PrivateSubnet3BID
-      - PrivateSubnet1CID
+      - PrivateSubnetAID
+      - PrivateSubnetBID
+      - PrivateSubnetCID
     - Label:
         default: Amazon EC2 configuration
       Parameters:
@@ -34,20 +30,12 @@ Metadata:
         default: Key pair name
       VPCID:
         default: VPC ID
-      PrivateSubnet1AID:
-        default: Private subnet 1 A CIDR
-      PrivateSubnet2AID:
-        default: Private subnet 2 A CIDR
-      PrivateSubnet3AID:
-        default: Private subnet 3 A CIDR
-      PrivateSubnet1BID:
-        default: Private subnet 1 B CIDR
-      PrivateSubnet2BID:
-        default: Private subnet 2 B CIDR
-      PrivateSubnet3BID:
-        default: Private subnet 3 B CIDR
-      PrivateSubnet1CID:
-        default: Private subnet 1 C CIDR
+      PrivateSubnetAID:
+        default: Node 1 Subnet
+      PrivateSubnetBID:
+        default: Node 2 Subnet
+      PrivateSubnetCID:
+        default: Witness Subnet
       QSS3BucketName:
         default: Quick Start S3 bucket name
       QSS3BucketRegion:
@@ -66,35 +54,19 @@ Parameters:
   VPCID:
     Description: ID of your existing VPC for deployment.
     Type: AWS::EC2::VPC::Id
-  PrivateSubnet1AID:
-    Description: ID of private subnet 1 in Availability Zone 1 for iSCSI ENI
-      for the first node (e.g., subnet-a0246dcd).
-    Type: AWS::EC2::Subnet::Id
-  PrivateSubnet2AID:
-    Description: ID of private subnet 2 in Availability Zone 1 for management ENI
-      for the first node (e.g., subnet-a0246dcd).
-    Type: AWS::EC2::Subnet::Id
-  PrivateSubnet3AID:
-    Description: ID of private subnet 3 in Availability Zone 1 for syncronization ENI
+  PrivateSubnetAID:
+    Description: ID of private subnet in Availability Zone 1
       for the first node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
 
-  PrivateSubnet1BID:
-    Description: ID of private subnet 1 in Availability Zone 2 for iSCSI ENI
-      for the second node (e.g., subnet-a0246dcd).
-    Type: AWS::EC2::Subnet::Id
-  PrivateSubnet2BID:
-    Description: ID of private subnet 2 in Availability Zone 2 for management ENI
-      for the second node (e.g., subnet-a0246dcd).
-    Type: AWS::EC2::Subnet::Id
-  PrivateSubnet3BID:
-    Description: ID of private subnet 3 in Availability Zone 2 for syncronization ENI
+  PrivateSubnetBID:
+    Description: ID of private subnet in Availability Zone 2
       for the second node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
 
-  PrivateSubnet1CID:
-    Description: ID of private subnet in Availability Zone 3 for the witness management ENI (e.g.,
-      subnet-a0246dcd).
+  PrivateSubnetCID:
+    Description: ID of private subnet in Availability Zone 3
+      for the witness (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -293,12 +265,8 @@ Resources:
           !Ref KeyPairName
         VPCID:
           !Ref VPCID
-        PrivateSubnet1ID:
-          !Ref PrivateSubnet1AID
-        PrivateSubnet2ID:
-          !Ref PrivateSubnet2AID
-        PrivateSubnet3ID:
-          !Ref PrivateSubnet3AID
+        PrivateSubnetID:
+          !Ref PrivateSubnetAID
         QSS3BucketName:
           !Ref QSS3BucketName
         QSS3BucketRegion:
@@ -324,12 +292,8 @@ Resources:
           !Ref KeyPairName
         VPCID:
           !Ref VPCID
-        PrivateSubnet1ID:
-          !Ref PrivateSubnet1BID
-        PrivateSubnet2ID:
-          !Ref PrivateSubnet2BID
-        PrivateSubnet3ID:
-          !Ref PrivateSubnet3BID
+        PrivateSubnetID:
+          !Ref PrivateSubnetBID
         QSS3BucketName:
           !Ref QSS3BucketName
         QSS3BucketRegion:
@@ -356,12 +320,8 @@ Resources:
           !Ref KeyPairName
         VPCID:
           !Ref VPCID
-        PrivateSubnet1ID:
-          !Ref PrivateSubnet1CID
-        PrivateSubnet2ID:
-          !Ref PrivateSubnet1CID
-        PrivateSubnet3ID:
-          !Ref PrivateSubnet1CID
+        PrivateSubnetID:
+          !Ref PrivateSubnetCID
         QSS3BucketName:
           !Ref QSS3BucketName
         QSS3BucketRegion:
