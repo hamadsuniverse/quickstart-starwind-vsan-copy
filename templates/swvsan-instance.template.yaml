@@ -17,12 +17,14 @@ Metadata:
     - Label:
         default: Amazon EC2 configuration
       Parameters:
+      - ParentStackName
       - NodeOrWitness
       - SWVSANEC2InstanceName
       - WorkloadInstanceType
       - SWVSANStorageVolumeSize
       - KeyPairName
       - SWVSANEC2IAMInstanceProfile
+      - SWVSANEC2IAMInstanceUserData
     - Label:
         default: AWS Quick Start configuration
       Parameters:
@@ -58,6 +60,10 @@ Metadata:
         default: Storage Node or Witness
       SWVSANEC2IAMInstanceProfile:
         default: IAM Instance Profile
+      SWVSANEC2IAMInstanceUserData:
+        default: EC2 Instance User Data Profile
+      ParentStackName:
+        default: Parent CloudFormation Stack Name
   AWSAMIRegionMap:
     Filters:
       VSANWIN2019:
@@ -285,6 +291,14 @@ Parameters:
   SWVSANEC2IAMInstanceProfile:
     Type: String
     Description: IAM Instance Profile to be used for the node/witness.
+  SWVSANEC2IAMInstanceUserData:
+    Type: String
+    Default: ""
+    Description: User Data script to be run on the EC2 instance post launch.
+  ParentStackName:
+    Type: String
+    Default: ""
+    Description: Parent Stack Name to tag the instane with. Used in Automation.
 Rules:
   KeyPairsNotEmpty:
     Assertions:
@@ -372,6 +386,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Ref SWVSANEC2InstanceName
+        - Key: qs-sw-vsan:parent-stack-name
+          Value: !Ref ParentStackName
       NetworkInterfaces:
         - Description: Management/Witness ENI
           DeviceIndex: '0'
@@ -399,3 +415,5 @@ Resources:
               PrivateIpAddress: !If [SyncronizationENIPrivateIPSpecified, !Ref SyncronizationENIPrivateIP, !Ref 'AWS::NoValue']
               SubnetId: !Ref PrivateSubnetID
             - !Ref 'AWS::NoValue'
+      UserData:
+        !Ref SWVSANEC2IAMInstanceUserData
