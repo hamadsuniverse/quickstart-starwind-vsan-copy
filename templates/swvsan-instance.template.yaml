@@ -12,8 +12,11 @@ Metadata:
       - VPCID
       - PrivateSubnetID
       - ISCSIENIPrivateIP
+      - ISCSIENISGId
       - ManagementENIPrivateIP
+      - ManagementENISGId
       - SyncronizationENIPrivateIP
+      - SyncronizationENISGId
     - Label:
         default: Amazon EC2 configuration
       Parameters:
@@ -38,10 +41,16 @@ Metadata:
         default: Private subnet ID
       ISCSIENIPrivateIP:
         default: iSCSI private IP address
+      ISCSIENISGId:
+        default: iSCSI ENI Security Group ID
       ManagementENIPrivateIP:
         default: Management/Witness private IP address
+      ManagementENISGId:
+        default: Management ENI Security Group ID
       SyncronizationENIPrivateIP:
         default: Syncronization private IP address
+      SyncronizationENISGId:
+        default: Syncronization ENI Security Group ID
       QSS3BucketName:
         default: Quick Start S3 bucket name
       QSS3BucketRegion:
@@ -86,15 +95,24 @@ Parameters:
     Default: 0.0.0.0
     Description: Private IP used for iSCSI traffic ENI. Specifying 0.0.0.0 will randomly select an available IP from the subnet.
     Type: String
+  ISCSIENISGId:
+    Default: default
+    Type: String
   ManagementENIPrivateIP:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 0.0.0.0
     Description: Private IP used for Management/Witness traffic ENI. Specifying 0.0.0.0 will randomly select an available IP from the subnet.
     Type: String
+  ManagementENISGId:
+    Default: default
+    Type: String
   SyncronizationENIPrivateIP:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 0.0.0.0
     Description: Private IP used for syncronization traffic ENI. Specifying 0.0.0.0 will randomly select an available IP from the subnet.
+    Type: String
+  SyncronizationENISGId:
+    Default: default
     Type: String
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -365,8 +383,11 @@ Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   IsStorageNode: !Equals [!Ref NodeOrWitness, 'Storage Node']
   ISCSIENIPrivateIPSpecified: !Not [!Equals [!Ref ISCSIENIPrivateIP, 0.0.0.0 ]]
+  ISCSIENISGIdSpecified: !Not [!Equals [!Ref ISCSIENISGId, default ]]
   ManagementENIPrivateIPSpecified: !Not [!Equals [!Ref ManagementENIPrivateIP, 0.0.0.0 ]]
+  ManagementENISGIdSpecified: !Not [!Equals [!Ref ManagementENISGId, default ]]
   SyncronizationENIPrivateIPSpecified: !Not [!Equals [!Ref SyncronizationENIPrivateIP, 0.0.0.0 ]]
+  SyncronizationENISGIdSpecified: !Not [!Equals [!Ref SyncronizationENISGId, default ]]
 Resources:
   SWVSANEC2Instance:
     Type: AWS::EC2::Instance
@@ -391,8 +412,8 @@ Resources:
       NetworkInterfaces:
         - Description: Management/Witness ENI
           DeviceIndex: '0'
-          # GroupSet:
-          #   - String
+          GroupSet:
+            - !If [ManagementENISGIdSpecified, !Ref ManagementENISGId, !Ref 'AWS::NoValue']
           PrivateIpAddress: !If [ManagementENIPrivateIPSpecified, !Ref ManagementENIPrivateIP, !Ref 'AWS::NoValue']
           SubnetId: !Ref PrivateSubnetID
         - !If
@@ -400,8 +421,8 @@ Resources:
             -
               Description: iSCSI ENI
               DeviceIndex: '1'
-              # GroupSet:
-              #   - String
+              GroupSet:
+                - !If [ISCSIENISGIdSpecified, !Ref ISCSIENISGId, !Ref 'AWS::NoValue']
               PrivateIpAddress: !If [ISCSIENIPrivateIPSpecified, !Ref ISCSIENIPrivateIP, !Ref 'AWS::NoValue']
               SubnetId: !Ref PrivateSubnetID
             - !Ref 'AWS::NoValue'
@@ -410,8 +431,8 @@ Resources:
             -
               Description: Syncronization ENI
               DeviceIndex: '2'
-              # GroupSet:
-              #   - String
+              GroupSet:
+                - !If [SyncronizationENISGIdSpecified, !Ref SyncronizationENISGId, !Ref 'AWS::NoValue']
               PrivateIpAddress: !If [SyncronizationENIPrivateIPSpecified, !Ref SyncronizationENIPrivateIP, !Ref 'AWS::NoValue']
               SubnetId: !Ref PrivateSubnetID
             - !Ref 'AWS::NoValue'

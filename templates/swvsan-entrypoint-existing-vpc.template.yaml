@@ -256,12 +256,12 @@ Resources:
     Type: AWS::CloudFormation::WaitCondition
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT10M
+        Timeout: PT15M
         Count: 1
     DependsOn: "StorageNode1Stack"
     Properties:
       Handle: !Ref SSMWaitHandle
-      Timeout: "600"
+      Timeout: "900"
       Count: 1
   SWVSANQuickstartSSMAutomation:
     Type: AWS::SSM::Document
@@ -612,6 +612,19 @@ Resources:
       Roles:
         - !Ref 'SWVSANEC2IAMRole'
       Path: /
+  SecurityGroupsStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/swvsan-securitygroups.template.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        VPCID:
+          !Ref VPCID
+        ParentStackName:
+          !Sub ${AWS::StackName}
   StorageNode1Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -629,6 +642,12 @@ Resources:
           !Ref VPCID
         PrivateSubnetID:
           !Ref PrivateSubnetAID
+        ISCSIENISGId:
+          !GetAtt SecurityGroupsStack.Outputs.ISCSIENISGId
+        ManagementENISGId:
+          !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
+        SyncronizationENISGId:
+          !GetAtt SecurityGroupsStack.Outputs.SyncronizationENISGId
         QSS3BucketName:
           !Ref QSS3BucketName
         QSS3BucketRegion:
@@ -673,6 +692,12 @@ Resources:
           !Ref VPCID
         PrivateSubnetID:
           !Ref PrivateSubnetBID
+        ISCSIENISGId:
+          !GetAtt SecurityGroupsStack.Outputs.ISCSIENISGId
+        ManagementENISGId:
+          !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
+        SyncronizationENISGId:
+          !GetAtt SecurityGroupsStack.Outputs.SyncronizationENISGId
         QSS3BucketName:
           !Ref QSS3BucketName
         QSS3BucketRegion:
@@ -705,6 +730,8 @@ Resources:
           !Ref VPCID
         PrivateSubnetID:
           !Ref PrivateSubnetCID
+        ManagementENISGId:
+          !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
         QSS3BucketName:
           !Ref QSS3BucketName
         QSS3BucketRegion:
