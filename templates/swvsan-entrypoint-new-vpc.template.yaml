@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This master template creates a VPC infrastructure for a multi-AZ
+Description: This main template creates a VPC infrastructure for a multi-AZ
   deployment of a StarWind VSAN on AWS. It deploys a VPC and 3 StarWind VSAN
   EC2 instances. Two nodes and a witness. **WARNING**
   This template creates EC2 instances and related resources. You will be billed for
