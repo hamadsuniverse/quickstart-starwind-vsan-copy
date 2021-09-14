@@ -17,6 +17,7 @@ Metadata:
     - Label:
         default: Amazon EC2 configuration
       Parameters:
+      - WorkloadInstanceType
       - SWVSANStorageVolumeSize
       - KeyPairName
     - Label:
@@ -492,7 +493,7 @@ Resources:
                     $freeDiskSpace =  Get-PSDrive D | Select-Object @{Expression={$_.Free/1MB}} | Select -expand '$_.Free/1MB'
                     # Extend the HA device to the full size of the volume
                     &"C:\Program Files\StarWind Software\StarWind\StarWindX\Samples\powershell\ExtendDevice.ps1" -addr $currentNodeSyncENIIp -deviceName "HAImage1" -extendSize $freeDiskSpace
-                    
+
             # If all steps complete successfully signals CFN of Success
           - name: "signalsuccess"
             action: "aws:executeAwsApi"
