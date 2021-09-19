@@ -544,7 +544,11 @@ Resources:
                 Action:
                   - ec2:DescribeInstances
                   - ec2:DescribeInstanceStatus
-                  - ssm:*
+                  - ssm:DescribeInstanceInformation
+                  - ssm:ListCommands
+                  - ssm:ListCommandInvocations
+                  - ssm:SendCommand
+                  - ssm:CancelCommand
                 Resource: '*'
           PolicyName: QS-SWVSAN-SSM-AutomationExecution
       Path: /
@@ -582,7 +586,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - ssm:StartAutomationExecution
-                Resource: '*'
+                Resource: !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:automation-definition/${SWVSANQuickstartSSMAutomation}:$DEFAULT'
           PolicyName: QS-SWVSAN-SSM-Trigger
         - PolicyDocument:
             Version: '2012-10-17'
