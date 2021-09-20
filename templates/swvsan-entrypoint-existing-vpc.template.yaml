@@ -14,6 +14,7 @@ Metadata:
       - PrivateSubnetAID
       - PrivateSubnetBID
       - PrivateSubnetCID
+      - RDPSGID
     - Label:
         default: Amazon EC2 configuration
       Parameters:
@@ -37,6 +38,8 @@ Metadata:
         default: Node 2 Subnet
       PrivateSubnetCID:
         default: Witness Subnet
+      RDPSGID:
+        default: RDP instnace(s) security group
       QSS3BucketName:
         default: Quick Start S3 bucket name
       QSS3BucketRegion:
@@ -59,16 +62,17 @@ Parameters:
     Description: ID of private subnet in Availability Zone 1
       for the first node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
-
   PrivateSubnetBID:
     Description: ID of private subnet in Availability Zone 2
       for the second node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
-
   PrivateSubnetCID:
     Description: ID of private subnet in Availability Zone 3
       for the witness (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
+  RDPSGID:
+    Description: ID of your Remote Desktop instance(s) security group.
+    Type: AWS::EC2::SecurityGroup::Id
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
@@ -630,6 +634,8 @@ Resources:
           !Ref VPCID
         ParentStackName:
           !Sub ${AWS::StackName}
+        RDPSGID:
+          !Ref RDPSGID
   StorageNode1Stack:
     Type: AWS::CloudFormation::Stack
     Properties:

@@ -9,11 +9,14 @@ Metadata:
       Parameters:
       - VPCID
       - ParentStackName
+      - RDPSGID
     ParameterLabels:
       VPCID:
         default: VPC ID
       ParentStackName:
         default: Parent CloudFormation Stack Name
+      RDPSGID:
+        default: RDP instnace(s) security group
 Parameters:
   VPCID:
     Description: ID of your existing VPC for deployment.
@@ -22,6 +25,9 @@ Parameters:
     Type: String
     Default: ""
     Description: Parent Stack Name to tag the instane with. Used in Automation.
+  RDPSGID:
+    Description: ID of your Remote Desktop instance(s) security group.
+    Type: AWS::EC2::SecurityGroup::Id
 Resources:
   ManagementENISG:
     Type: AWS::EC2::SecurityGroup
@@ -40,6 +46,15 @@ Resources:
       SourceSecurityGroupId: !GetAtt ManagementENISG.GroupId
       FromPort: 3261
       ToPort: 3261
+  ManagementEniAllowRDPCommunicationRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access
+      GroupId: !GetAtt ManagementENISG.GroupId
+      IpProtocol: tcp
+      SourceSecurityGroupId: !Ref RDPSGID
+      FromPort: 3389
+      ToPort: 3389
   SyncronizationENISG:
       Type: AWS::EC2::SecurityGroup
       Properties:
