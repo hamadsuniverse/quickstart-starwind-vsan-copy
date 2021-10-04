@@ -410,31 +410,57 @@ Resources:
         - Key: qs-sw-vsan:parent-stack-name
           Value: !Ref ParentStackName
       NetworkInterfaces:
-        - Description: Management/Witness ENI
+        - NetworkInterfaceId: !Ref ManagementNetworkInterface
           DeviceIndex: '0'
-          GroupSet:
-            - !If [ManagementENISGIdSpecified, !Ref ManagementENISGId, !Ref 'AWS::NoValue']
-          PrivateIpAddress: !If [ManagementENIPrivateIPSpecified, !Ref ManagementENIPrivateIP, !Ref 'AWS::NoValue']
-          SubnetId: !Ref PrivateSubnetID
         - !If
             - IsStorageNode
             -
-              Description: iSCSI ENI
+              NetworkInterfaceId: !Ref IscsiNetworkInterface
               DeviceIndex: '1'
-              GroupSet:
-                - !If [ISCSIENISGIdSpecified, !Ref ISCSIENISGId, !Ref 'AWS::NoValue']
-              PrivateIpAddress: !If [ISCSIENIPrivateIPSpecified, !Ref ISCSIENIPrivateIP, !Ref 'AWS::NoValue']
-              SubnetId: !Ref PrivateSubnetID
             - !Ref 'AWS::NoValue'
         - !If
             - IsStorageNode
             -
-              Description: Syncronization ENI
+              NetworkInterfaceId: !Ref SyncNetworkInterface
               DeviceIndex: '2'
-              GroupSet:
-                - !If [SyncronizationENISGIdSpecified, !Ref SyncronizationENISGId, !Ref 'AWS::NoValue']
-              PrivateIpAddress: !If [SyncronizationENIPrivateIPSpecified, !Ref SyncronizationENIPrivateIP, !Ref 'AWS::NoValue']
-              SubnetId: !Ref PrivateSubnetID
             - !Ref 'AWS::NoValue'
       UserData:
         !Ref SWVSANEC2IAMInstanceUserData
+  ManagementNetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: Management/Witness ENI
+      GroupSet:
+        - !If [ManagementENISGIdSpecified, !Ref ManagementENISGId, !Ref 'AWS::NoValue']
+      PrivateIpAddress: !If [ManagementENIPrivateIPSpecified, !Ref ManagementENIPrivateIP, !Ref 'AWS::NoValue']
+      SubnetId: !Ref PrivateSubnetID
+  IscsiNetworkInterface:
+    Condition: IsStorageNode
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: iSCSI ENI
+      GroupSet:
+        - !If [ISCSIENISGIdSpecified, !Ref ISCSIENISGId, !Ref 'AWS::NoValue']
+      PrivateIpAddress: !If [ISCSIENIPrivateIPSpecified, !Ref ISCSIENIPrivateIP, !Ref 'AWS::NoValue']
+      SubnetId: !Ref PrivateSubnetID
+  SyncNetworkInterface:
+    Condition: IsStorageNode
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: Syncronization ENI
+      GroupSet:
+        - !If [SyncronizationENISGIdSpecified, !Ref SyncronizationENISGId, !Ref 'AWS::NoValue']
+      PrivateIpAddress: !If [SyncronizationENIPrivateIPSpecified, !Ref SyncronizationENIPrivateIP, !Ref 'AWS::NoValue']
+      SubnetId: !Ref PrivateSubnetID
+Outputs:
+  SWVSANEC2InstanceManagementIP:
+    Description: Management IP Address of StarWind EC2 instance
+    Value: !GetAtt ManagementNetworkInterface.PrimaryPrivateIpAddress
+  SWVSANEC2InstanceIscsiIP:
+    Condition: IsStorageNode
+    Description: iSCSI IP Address of StarWind EC2 instance
+    Value: !GetAtt IscsiNetworkInterface.PrimaryPrivateIpAddress
+  SWVSANEC2InstanceSyncronizationIP:
+    Condition: IsStorageNode
+    Description: Syncronization IP Address of StarWind EC2 instance
+    Value: !GetAtt SyncNetworkInterface.PrimaryPrivateIpAddress
