@@ -795,3 +795,25 @@ Resources:
           !Ref SWVSANEC2IAMInstanceProfile
         ParentStackName:
           !Sub ${AWS::StackName}
+Outputs:
+  StorageNode1ManagementIP:
+    Description: Management IP Address of Storage Node 1
+    Value: !GetAtt StorageNode1Stack.Outputs.SWVSANEC2InstanceManagementIP
+  StorageNode1IscsiIP:
+    Description: iSCSI IP Address of Storage Node 1
+    Value: !GetAtt StorageNode1Stack.Outputs.SWVSANEC2InstanceIscsiIP
+  StorageNode1SyncronizationIP:
+    Description: Syncronization IP Address of Storage Node 1
+    Value: !GetAtt StorageNode1Stack.Outputs.SWVSANEC2InstanceSyncronizationIP
+  StorageNode2ManagementIP:
+    Description: Management IP Address of Storage Node 2
+    Value: !GetAtt StorageNode2Stack.Outputs.SWVSANEC2InstanceManagementIP
+  StorageNode2IscsiIP:
+    Description: iSCSI IP Address of Storage Node 2
+    Value: !GetAtt StorageNode2Stack.Outputs.SWVSANEC2InstanceIscsiIP
+  StorageNode2SyncronizationIP:
+    Description: Syncronization IP Address of Storage Node 2
+    Value: !GetAtt StorageNode2Stack.Outputs.SWVSANEC2InstanceSyncronizationIP
+  WitnessNodeManagementIP:
+    Description: Management IP Address of Witness Node
+    Value: !GetAtt WitnessNodeStack.Outputs.SWVSANEC2InstanceManagementIP

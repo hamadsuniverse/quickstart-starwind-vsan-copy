@@ -401,3 +401,24 @@ Outputs:
   RDPUser:
     Description: RDP Gateway admin user
     Value: StackAdmin
+  StorageNode1ManagementIP:
+    Description: Management IP Address of Storage Node 1
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode1ManagementIP
+  StorageNode1IscsiIP:
+    Description: iSCSI IP Address of Storage Node 1
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode1IscsiIP
+  StorageNode1SyncronizationIP:
+    Description: Syncronization IP Address of Storage Node 1
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode1SyncronizationIP
+  StorageNode2ManagementIP:
+    Description: Management IP Address of Storage Node 2
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode2ManagementIP
+  StorageNode2IscsiIP:
+    Description: iSCSI IP Address of Storage Node 2
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode2IscsiIP
+  StorageNode2SyncronizationIP:
+    Description: Syncronization IP Address of Storage Node 2
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode2SyncronizationIP
+  WitnessNodeManagementIP:
+    Description: Management IP Address of Witness Node
+    Value: !GetAtt WorkloadStack.Outputs.WitnessNodeManagementIP
