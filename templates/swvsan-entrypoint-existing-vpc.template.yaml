@@ -360,7 +360,7 @@ Resources:
             timeoutSeconds: 60
           - name: WaitForWitness
             action: 'aws:waitForAwsResourceProperty'
-            nextStep: StaticIPsConfig
+            nextStep: EnableIscsiMpio
             inputs:
               Service: ec2
               Api: DescribeInstanceStatus
@@ -370,6 +370,44 @@ Resources:
               InstanceIds:
                 - '{{swvsanWitnessInstanceId.InstanceId}}'
             timeoutSeconds: 60
+          - name: EnableIscsiMpio
+            action: aws:runCommand
+            nextStep: StaticIPsConfig
+            onFailure: "step:signalfailure"
+            inputs:
+              DocumentName: AWS-RunPowerShellScript
+              InstanceIds:
+                - "{{swvsanNode1InstanceId.InstanceId}}"
+                - "{{swvsanNode2InstanceId.InstanceId}}"
+                # - "{{swvsanWitnessInstanceId.InstanceId}}"
+              # CloudWatchOutputConfig:
+              #   CloudWatchOutputEnabled: "true"
+              #   CloudWatchLogGroupName: !Sub '/aws/Quick_Start/${AWS::StackName}'
+              Parameters:
+                commands:
+                  - |
+                    # Get iscsi service info
+                    $iscsi = Get-Service MSiSCSI
+                    # if startup type is not automatic
+                    if ($iscsi.StartType -ne "Automatic") {
+                      # Set start type to automatic
+                      $iscsi | Set-Service -StartType Automatic
+                      # start the service (incase it is stopped)
+                      Start-Service MSiSCSI
+                    }
+
+                    # Get MPIO feature info
+                    $mpio = Get-WindowsFeature -Name Multipath-IO
+                    # if its not installed
+                    if (-not $mpio.Installed) {
+                      # install the MPIO feature
+                      Install-WindowsFeature -Name Multipath-IO
+                      # Tell SSM to reboot.
+                      exit 3010
+                    }
+
+                    # enable MPIO on iSCSI
+                    Enable-MSDSMAutomaticClaim -BusType "iSCSI"
           - name: StaticIPsConfig
             action: aws:runCommand
             nextStep: StarWindEBSVolumeConfig
