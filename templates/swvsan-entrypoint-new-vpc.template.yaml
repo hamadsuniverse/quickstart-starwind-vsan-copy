@@ -27,6 +27,7 @@ Metadata:
         default: Amazon EC2 configuration
       Parameters:
       - WorkloadInstanceType
+      - SWVSANAMIOS
       - SWVSANStorageVolumeSize
       - KeyPairName
     - Label:
@@ -60,6 +61,8 @@ Metadata:
         default: Quick Start S3 Key Prefix
       WorkloadInstanceType:
         default: Workload servers instance type
+      SWVSANAMIOS:
+        default: Workload servers OS version
       SWVSANStorageVolumeSize:
         default: Secondary EBS volume size
       KeyPairName:
@@ -300,6 +303,13 @@ Parameters:
     Default: m5.2xlarge
     Description: Type of EC2 instance for the workload instances.
     Type: String
+  SWVSANAMIOS:
+    Type: String
+    Description: Operating system version of the StarWind instances to be created.
+    Default: WindowsServer2019
+    AllowedValues:
+      - WindowsServer2019
+      - WindowsServer2016
   SWVSANStorageVolumeSize:
     Type: Number
     Default: 100
@@ -390,6 +400,8 @@ Resources:
           Ref: QSS3KeyPrefix
         WorkloadInstanceType:
           Ref: WorkloadInstanceType
+        SWVSANAMIOS:
+          !Ref SWVSANAMIOS
         SWVSANStorageVolumeSize:
           Ref: SWVSANStorageVolumeSize
         KeyPairName:

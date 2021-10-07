@@ -281,6 +281,13 @@ Parameters:
     Default: m5.2xlarge
     Description: Type of EC2 instance for the workload instances.
     Type: String
+  SWVSANAMIOS:
+    Type: String
+    Description: Operating system version of the StarWind instance to be created.
+    Default: WindowsServer2019
+    AllowedValues:
+      - WindowsServer2019
+      - WindowsServer2016
   SWVSANStorageVolumeSize:
     Type: Number
     Default: 100
@@ -330,8 +337,8 @@ Rules:
 Mappings:
   AMI:
     Alias:
-      VSANWIN2019: /aws/service/marketplace/prod-2kn75c3qalr2u/8.0.0.13586
-      VSANWIN2016: /aws/service/marketplace/prod-u6mi75plvwbtw/8.0.0.13586
+      WindowsServer2019: /aws/service/marketplace/prod-2kn75c3qalr2u/8.0.0.13586
+      WindowsServer2016: /aws/service/marketplace/prod-u6mi75plvwbtw/8.0.0.13586
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   IsStorageNode: !Equals [!Ref NodeOrWitness, 'Storage Node']
@@ -347,7 +354,7 @@ Resources:
     Properties:
       ImageId: !Sub
         - "resolve:ssm:${AmiAlias}"
-        - { AmiAlias: !FindInMap [AMI, Alias, VSANWIN2016] }
+        - { AmiAlias: !FindInMap [AMI, Alias, !Ref SWVSANAMIOS] }
       InstanceType: !Ref WorkloadInstanceType
       KeyName: !Ref KeyPairName
       IamInstanceProfile: !Ref 'SWVSANEC2IAMInstanceProfile'
