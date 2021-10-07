@@ -271,12 +271,12 @@ Resources:
     Type: AWS::CloudFormation::WaitCondition
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT15M
+        Timeout: PT20M
         Count: 1
     DependsOn: "StorageNode1Stack"
     Properties:
       Handle: !Ref SSMWaitHandle
-      Timeout: "900"
+      Timeout: "1200"
       Count: 1
   SWVSANQuickstartSSMAutomation:
     Type: AWS::SSM::Document
