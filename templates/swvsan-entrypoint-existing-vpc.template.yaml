@@ -510,13 +510,13 @@ Resources:
                     # Disable windows server firewall to allow inter-node communication
                     Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-                    $instanceId = Invoke-WebRequest -Uri http://169.254.169.254/latest/meta-data/instance-id -UseBasicParsing | Select -expand "Content"
+                    $currentNodeInstanceId = Invoke-WebRequest -Uri http://169.254.169.254/latest/meta-data/instance-id -UseBasicParsing | Select -expand "Content"
                     $ENInames = "Management/Witness ENI","iSCSI ENI","Syncronization ENI"
                     # storing commands in an array as changing network config on the fly causes IAM errors
                     $setupCommands = new-object collections.generic.list[object]
 
                     foreach ($eni in $ENInames) {
-                      $eniIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$instanceId"},@{Name="description";Values="$eni"} -Select 'NetworkInterfaces.PrivateIpAddress'
+                      $eniIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$currentNodeInstanceId"},@{Name="description";Values="$eni"} -Select 'NetworkInterfaces.PrivateIpAddress'
                       $ethernetDeviceName = (Get-NetIPAddress "$eniIp").InterfaceAlias
                       $networkInterfaceIndex = (Get-NetIPAddress "$eniIp").InterfaceIndex
                       $dnsIp = (Get-NetIPConfiguration -InterfaceIndex (Get-NetIPAddress "$eniIp").InterfaceIndex).DNSServer.ServerAddresses
@@ -545,7 +545,7 @@ Resources:
                       $setupCommands.Add("Set-DnsClientServerAddress -InterfaceIndex $networkInterfaceIndex -ServerAddresses ('$dnsIp')")
 
                       if ($eni -eq "Syncronization ENI") {
-                        $currentNodeName = Get-EC2Tag -Filter @{Name="resource-type";Values="instance"},@{Name="resource-id";Values="$instanceId"},@{Name="key";Values="Name"} -Select 'Tags.Value'
+                        $currentNodeName = Get-EC2Tag -Filter @{Name="resource-type";Values="instance"},@{Name="resource-id";Values="$currentNodeInstanceId"},@{Name="key";Values="Name"} -Select 'Tags.Value'
                         $otherNodeName   = "StarWind Node 2"
                         if ($currentNodeName -eq $otherNodeName) {
                           $otherNodeName = "StarWind Node 1"
