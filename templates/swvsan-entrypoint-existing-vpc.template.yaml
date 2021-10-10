@@ -22,6 +22,9 @@ Metadata:
       - SWVSANAMIOS
       - SWVSANStorageVolumeSize
       - KeyPairName
+      - Node1NetBiosName
+      - Node2NetBiosName
+      - WitnessNodeNetBiosName
     - Label:
         default: AWS Quick Start configuration
       Parameters:
@@ -53,6 +56,12 @@ Metadata:
         default: Workload servers OS version
       SWVSANStorageVolumeSize:
         default: Secondary EBS volume size
+      Node1NetBiosName:
+        default: Node 1 NetBios Name
+      Node2NetBiosName:
+        default: Node 2 NetBios Name
+      WitnessNodeNetBiosName:
+        default: Witness Node NetBios Name
 Parameters:
   KeyPairName:
     Description: Name of an existing EC2 key pair. The instance will launch with
@@ -262,6 +271,27 @@ Parameters:
     MinValue: 1
     MaxValue: 16000
     Description: Size for SarWind VSAN virtualized storage in GBs.
+  Node1NetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANNODE1"
+    Description: "NetBIOS name of storage node 1 (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
+  Node2NetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANNODE2"
+    Description: "NetBIOS name of storage node 2 (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
+  WitnessNodeNetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANWIT"
+    Description: "NetBIOS name of witness node (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
@@ -290,6 +320,15 @@ Resources:
           StackName:
             type: String
             description: The CloudFormation Stack name this automation belongs to.
+          Node1Name:
+            type: String
+            description: NetBIOS name for storage node 1
+          Node2Name:
+            type: String
+            description: NetBIOS name for storage node 2
+          WitnessNodeName:
+            type: String
+            description: NetBIOS name for witness node
           AutomationAssumeRole:
             type: String
             description: |-
@@ -370,7 +409,7 @@ Resources:
             timeoutSeconds: 60
           - name: WaitForWitness
             action: 'aws:waitForAwsResourceProperty'
-            nextStep: EnableIscsiMpio
+            nextStep: renameComputer
             inputs:
               Service: ec2
               Api: DescribeInstanceStatus
@@ -380,6 +419,40 @@ Resources:
               InstanceIds:
                 - '{{swvsanWitnessInstanceId.InstanceId}}'
             timeoutSeconds: 60
+          - name: renameComputer
+            action: aws:runCommand
+            nextStep: EnableIscsiMpio
+            onFailure: "step:signalfailure"
+            inputs:
+              DocumentName: AWS-RunPowerShellScript
+              InstanceIds:
+                - "{{swvsanNode1InstanceId.InstanceId}}"
+                - "{{swvsanNode2InstanceId.InstanceId}}"
+                - "{{swvsanWitnessInstanceId.InstanceId}}"
+              # CloudWatchOutputConfig:
+              #   CloudWatchOutputEnabled: "true"
+              #   CloudWatchLogGroupName: !Sub '/aws/Quick_Start/${AWS::StackName}'
+              Parameters:
+                commands:
+                  - |
+                    $currentNodeInstanceId = Invoke-WebRequest -Uri http://169.254.169.254/latest/meta-data/instance-id -UseBasicParsing | Select -expand "Content"
+                    $currentNodeName = Get-EC2Tag -Filter @{Name="resource-type";Values="instance"},@{Name="resource-id";Values="$currentNodeInstanceId"},@{Name="key";Values="Name"} -Select 'Tags.Value'
+                    $newName = switch ( $currentNodeName )
+                    {
+                        'StarWind Node 1'   { '{{Node1Name}}'       }
+                        'StarWind Node 2'   { '{{Node2Name}}'       }
+                        'StarWind Witness'  { '{{WitnessNodeName}}' }
+                    }
+                    # get current computer name
+                    $currentName = (gwmi WIN32_ComputerSystem).Name
+                    # if name is not updated
+                    if ($currentName -ne $newName) {
+                      # change computer name
+                      Rename-Computer -NewName $newName
+                      # Tell SSM to reboot.
+                      exit 3010
+                    }
+                    echo "New name is: $currentName"
           - name: EnableIscsiMpio
             action: aws:runCommand
             nextStep: StaticIPsConfig
@@ -729,6 +802,12 @@ Resources:
               - !Sub '"${SWVSANQuickstartSSMAutomation}"'
               - ' -Parameter @{"StackName"='
               - !Sub '"${AWS::StackName}"'
+              - ';"Node1Name"='
+              - !Sub '"${Node1NetBiosName}"'
+              - ';"Node2Name"='
+              - !Sub '"${Node2NetBiosName}"'
+              - ';"WitnessNodeName"='
+              - !Sub '"${WitnessNodeNetBiosName}"'
               - ';"AutomationAssumeRole"='
               - !Sub '"arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${SWVSANSSMIAMRole}"'
               - '}'

@@ -30,6 +30,9 @@ Metadata:
       - SWVSANAMIOS
       - SWVSANStorageVolumeSize
       - KeyPairName
+      - Node1NetBiosName
+      - Node2NetBiosName
+      - WitnessNodeNetBiosName
     - Label:
         default: AWS Quick Start configuration
       Parameters:
@@ -71,6 +74,12 @@ Metadata:
         default: Admin password
       RDGWCIDR:
         default: Allowed Remote Desktop Gateway external access CIDR
+      Node1NetBiosName:
+        default: Node 1 NetBios Name
+      Node2NetBiosName:
+        default: Node 2 NetBios Name
+      WitnessNodeNetBiosName:
+        default: Witness Node NetBios Name
 Parameters:
   AvailabilityZones:
     Description: List of Availability Zones to use for the subnets in the VPC.
@@ -321,6 +330,27 @@ Parameters:
     Description: Name of an existing EC2 key pair. The instance will launch with
       this key pair.
     Type: AWS::EC2::KeyPair::KeyName
+  Node1NetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANNODE1"
+    Description: "NetBIOS name of storage node 1 (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
+  Node2NetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANNODE2"
+    Description: "NetBIOS name of storage node 2 (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
+  WitnessNodeNetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANWIT"
+    Description: "NetBIOS name of witness node (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
@@ -406,6 +436,12 @@ Resources:
           Ref: SWVSANStorageVolumeSize
         KeyPairName:
           Ref: KeyPairName
+        Node1NetBiosName:
+          !Ref Node1NetBiosName
+        Node2NetBiosName:
+          !Ref Node2NetBiosName
+        WitnessNodeNetBiosName:
+          !Ref WitnessNodeNetBiosName
 Outputs:
   RDPURL:
     Description: ELB DNS name to connect to RDP Gateway.
