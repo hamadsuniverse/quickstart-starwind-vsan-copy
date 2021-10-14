@@ -4,4 +4,4 @@
 
 This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture on the AWS Cloud.
 
-This Quick Start is for users who need highly-available multi-AZ storage that can be access using iSCSI as block devices. One primary usecase is to support applications running on Windows Server Failover Clusters (WSFC) that require shared cluster volumes.
+This Quick Start is for users who need highly-available multi-AZ storage that can be access using iSCSI as block devices. One primary use-case is to support applications running on Windows Server Failover Clusters (WSFC) that require shared cluster volumes.
