@@ -19,11 +19,20 @@ Metadata:
       - PrivateSubnet2CIDR
       - PrivateSubnet3CIDR
     - Label:
+        default: Microsoft Remote Desktop Gateway configuration
+      Parameters:
+        - RDGWCIDR
+        - AdminPassword
+    - Label:
         default: Amazon EC2 configuration
       Parameters:
       - WorkloadInstanceType
+      - SWVSANAMIOS
       - SWVSANStorageVolumeSize
       - KeyPairName
+      - Node1NetBiosName
+      - Node2NetBiosName
+      - WitnessNodeNetBiosName
     - Label:
         default: AWS Quick Start configuration
       Parameters:
@@ -55,10 +64,22 @@ Metadata:
         default: Quick Start S3 Key Prefix
       WorkloadInstanceType:
         default: Workload servers instance type
+      SWVSANAMIOS:
+        default: Workload servers OS version
       SWVSANStorageVolumeSize:
         default: Secondary EBS volume size
       KeyPairName:
         default: Key pair name
+      AdminPassword:
+        default: Admin password
+      RDGWCIDR:
+        default: Allowed Remote Desktop Gateway external access CIDR
+      Node1NetBiosName:
+        default: Node 1 NetBios Name
+      Node2NetBiosName:
+        default: Node 2 NetBios Name
+      WitnessNodeNetBiosName:
+        default: Witness Node NetBios Name
 Parameters:
   AvailabilityZones:
     Description: List of Availability Zones to use for the subnets in the VPC.
@@ -106,6 +127,18 @@ Parameters:
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.64.0/19
     Description: CIDR block for private subnet located in Availability Zone 3.
+    Type: String
+  AdminPassword:
+    Description: Password for the administrative account. Must be at least 8 characters
+      containing letters, numbers, and symbols.
+    Type: String
+    MinLength: '8'
+    MaxLength: '32'
+    AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
+    NoEcho: 'true'
+  RDGWCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+    Description: Allowed CIDR Block for external access to the Remote Desktop Gateways.
     Type: String
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -279,6 +312,13 @@ Parameters:
     Default: m5.2xlarge
     Description: Type of EC2 instance for the workload instances.
     Type: String
+  SWVSANAMIOS:
+    Type: String
+    Description: Operating system version of the StarWind instances to be created.
+    Default: WindowsServer2019
+    AllowedValues:
+      - WindowsServer2019
+      - WindowsServer2016
   SWVSANStorageVolumeSize:
     Type: Number
     Default: 100
@@ -290,6 +330,27 @@ Parameters:
     Description: Name of an existing EC2 key pair. The instance will launch with
       this key pair.
     Type: AWS::EC2::KeyPair::KeyName
+  Node1NetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANNODE1"
+    Description: "NetBIOS name of storage node 1 (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
+  Node2NetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANNODE2"
+    Description: "NetBIOS name of storage node 2 (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
+  WitnessNodeNetBiosName:
+    AllowedPattern: '[a-zA-Z0-9\-]+'
+    Default: "SWVSANWIT"
+    Description: "NetBIOS name of witness node (up to 15 characters)."
+    MaxLength: '15'
+    MinLength: '1'
+    Type: "String"
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
@@ -321,6 +382,27 @@ Resources:
           Ref: PrivateSubnet2CIDR
         PrivateSubnet3ACIDR:
           Ref: PrivateSubnet3CIDR
+  RDGStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-microsoft-rdgateway/templates/rdgw-standalone.template'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        VPCID:
+          !GetAtt VPCStack.Outputs.VPCID
+        PublicSubnet1ID:
+          !GetAtt VPCStack.Outputs.PublicSubnet1ID
+        PublicSubnet2ID:
+          !GetAtt VPCStack.Outputs.PublicSubnet2ID
+        RDGWCIDR:
+          Ref: RDGWCIDR
+        KeyPairName:
+          Ref: KeyPairName
+        AdminPassword:
+          Ref: AdminPassword
   WorkloadStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -338,6 +420,8 @@ Resources:
           !GetAtt VPCStack.Outputs.PrivateSubnet2AID
         PrivateSubnetCID:
           !GetAtt VPCStack.Outputs.PrivateSubnet3AID
+        RDPSGID:
+          !GetAtt RDGStack.Outputs.RemoteDesktopGatewaySGID
         QSS3BucketName:
           Ref: QSS3BucketName
         QSS3BucketRegion:
@@ -346,7 +430,43 @@ Resources:
           Ref: QSS3KeyPrefix
         WorkloadInstanceType:
           Ref: WorkloadInstanceType
+        SWVSANAMIOS:
+          !Ref SWVSANAMIOS
         SWVSANStorageVolumeSize:
           Ref: SWVSANStorageVolumeSize
         KeyPairName:
           Ref: KeyPairName
+        Node1NetBiosName:
+          !Ref Node1NetBiosName
+        Node2NetBiosName:
+          !Ref Node2NetBiosName
+        WitnessNodeNetBiosName:
+          !Ref WitnessNodeNetBiosName
+Outputs:
+  RDPURL:
+    Description: ELB DNS name to connect to RDP Gateway.
+    Value: !GetAtt RDGStack.Outputs.RDPURL
+  RDPUser:
+    Description: RDP Gateway admin user
+    Value: StackAdmin
+  StorageNode1ManagementIP:
+    Description: Management IP Address of Storage Node 1
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode1ManagementIP
+  StorageNode1IscsiIP:
+    Description: iSCSI IP Address of Storage Node 1
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode1IscsiIP
+  StorageNode1SyncronizationIP:
+    Description: Syncronization IP Address of Storage Node 1
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode1SyncronizationIP
+  StorageNode2ManagementIP:
+    Description: Management IP Address of Storage Node 2
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode2ManagementIP
+  StorageNode2IscsiIP:
+    Description: iSCSI IP Address of Storage Node 2
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode2IscsiIP
+  StorageNode2SyncronizationIP:
+    Description: Syncronization IP Address of Storage Node 2
+    Value: !GetAtt WorkloadStack.Outputs.StorageNode2SyncronizationIP
+  WitnessNodeManagementIP:
+    Description: Management IP Address of Witness Node
+    Value: !GetAtt WorkloadStack.Outputs.WitnessNodeManagementIP
