@@ -697,7 +697,7 @@ Resources:
                     Set-MSDSMGlobalDefaultLoadBalancePolicy -Policy LQD
           - name: CreateVolumeOnIscsiStarWindDevices
             action: aws:runCommand
-            nextStep: signalsuccess
+            nextStep: renameStorageNode1EC2
             onFailure: "step:signalfailure"
             inputs:
               DocumentName: AWS-RunPowerShellScript
@@ -720,6 +720,39 @@ Resources:
                     $diskselection2 = Get-Disk | Where-Object SerialNumber -eq $device2ID | foreach Number
 
                     New-Volume -FriendlyName CSV -DiskNumber $diskselection2 -FileSystem NTFS -AllocationUnitSize 4096
+          - name: renameStorageNode1EC2
+            action: 'aws:executeAwsApi'
+            nextStep: renameStorageNode2EC2
+            inputs:
+              Service: ec2
+              Api: CreateTags
+              Resources:
+                - '{{swvsanNode1InstanceId.InstanceId}}'
+              Tags:
+                - Key: Name
+                  Value: '{{Node1Name}}'
+          - name: renameStorageNode2EC2
+            action: 'aws:executeAwsApi'
+            nextStep: renameWitnessNodeEC2
+            inputs:
+              Service: ec2
+              Api: CreateTags
+              Resources:
+                - '{{swvsanNode2InstanceId.InstanceId}}'
+              Tags:
+                - Key: Name
+                  Value: '{{Node2Name}}'
+          - name: renameWitnessNodeEC2
+            action: 'aws:executeAwsApi'
+            nextStep: signalsuccess
+            inputs:
+              Service: ec2
+              Api: CreateTags
+              Resources:
+                - '{{swvsanWitnessInstanceId.InstanceId}}'
+              Tags:
+                - Key: Name
+                  Value: '{{WitnessNodeName}}'
             # If all steps complete successfully signals CFN of Success
           - name: "signalsuccess"
             action: "aws:executeAwsApi"
@@ -770,6 +803,7 @@ Resources:
                 Action:
                   - ec2:DescribeInstances
                   - ec2:DescribeInstanceStatus
+                  - ec2:CreateTags
                   - ssm:DescribeInstanceInformation
                   - ssm:ListCommands
                   - ssm:ListCommandInvocations
