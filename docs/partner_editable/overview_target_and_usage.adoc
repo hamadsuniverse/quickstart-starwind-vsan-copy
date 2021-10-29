@@ -2,6 +2,6 @@
 // Identify your target audience and explain how/why they would use this Quick Start.
 //Avoid borrowing text from third-party websites (copying text from AWS service documentation is fine). Also, avoid marketing-speak, focusing instead on the technical aspect.
 
-This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture on the AWS Cloud.
+This guide provides instructions for deploying the StarWind VSAN Quick Start reference architecture on the AWS Cloud.
 
-This Quick Start is for users who need highly-available multi-AZ storage that can be access using iSCSI as block devices. One primary use-case is to support applications running on Windows Server Failover Clusters (WSFC) that require shared cluster volumes.
+This Quick Start is for users who need to ensure maximum uptime for their applications and services running in AWS Cloud environment. This is achieved by delivering highly available iSCSI shared storage spanned across multiple Availablity Zones. The primary use-case is to support applications running inside Windows Server Failover Clusters (WSFC) on highly available cluster shared volumes (CSV).
