@@ -337,8 +337,8 @@ Rules:
 Mappings:
   AMI:
     Alias:
-      WindowsServer2019: /aws/service/marketplace/prod-2kn75c3qalr2u/8.0.0.13586
-      WindowsServer2016: /aws/service/marketplace/prod-u6mi75plvwbtw/8.0.0.13586
+      WindowsServer2019: /aws/service/marketplace/prod-2kn75c3qalr2u/latest
+      WindowsServer2016: /aws/service/marketplace/prod-u6mi75plvwbtw/latest
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   IsStorageNode: !Equals [!Ref NodeOrWitness, 'Storage Node']
