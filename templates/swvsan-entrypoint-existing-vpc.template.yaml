@@ -695,6 +695,9 @@ Resources:
                     Connect-IscsiTarget -NodeAddress $otherNodeIscsiAddress -TargetPortalAddress $destinationIscsiIp -InitiatorPortalAddress $sourceIscsiIP -TargetPortalPortNumber 3260 -IsMultipathEnabled $true -IsPersistent $true
 
                     Set-MSDSMGlobalDefaultLoadBalancePolicy -Policy LQD
+
+                    # print currently configured iscsi targets
+                    Get-IscsiTarget
           - name: CreateVolumeOnIscsiStarWindDevices
             action: aws:runCommand
             nextStep: renameStorageNode1EC2
