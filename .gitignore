@@ -31,3 +31,4 @@ Temporary Items
 # local taskcat files and folders
 taskcat_outputs
 .taskcat
+.taskcat_*
