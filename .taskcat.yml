@@ -7,7 +7,7 @@ project:
   parameters:
     AvailabilityZones: $[taskcat_genaz_3]
     KeyPairName: $[taskcat_getkeypair]
-    WorkloadInstanceType: m5.2xlarge
+    WorkloadInstanceType: m5.xlarge
     AdminPassword: $[taskcat_genpass_8S]
     RDGWCIDR: 10.0.0.0/32
     QSS3KeyPrefix: "quickstart-starwind-vsan/"
