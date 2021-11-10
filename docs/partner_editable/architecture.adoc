@@ -21,8 +21,8 @@ internet access for resources in the private subnets.*
 ** A Windows bastion host in an Auto Scaling group to allow inbound Secure
 Remote Desktop (RDP) access to EC2 instances in public and private subnets.*
 * In the private subnets:
-** 2 EC2 instances with 3 Network interfaces each. (StarWind VSAN storage nodes)
-** 1 EC2 instance with 1 network interface. (StarWind VSAN witness)
+** 2 EC2 instances with 3 Network interfaces each. (StarWind VSAN EC2 storage instances)
+** 1 EC2 instance with 1 network interface. (StarWind VSAN EC2 Witness instance)
 // Add bullet points for any additional components that are included in the deployment. Make sure that the additional components are also represented in the architecture diagram. End each bullet with a period.
 // * <describe any additional components>.
 
