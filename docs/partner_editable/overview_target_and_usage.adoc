@@ -4,4 +4,4 @@
 
 This guide provides instructions for deploying the StarWind VSAN Quick Start reference architecture on the AWS Cloud.
 
-This Quick Start is for users who need to ensure maximum uptime for their applications and services running in AWS Cloud environment. This is achieved by delivering highly available iSCSI shared storage spanned across multiple Availablity Zones. The primary use-case is to support applications running inside Windows Server Failover Clusters (WSFC) on highly available cluster shared volumes (CSV).
+This Quick Start is for users who need highly available iSCSI shared storage that spans multiple Availability Zones. The primary use-case is to support applications running inside Windows Server Failover Clusters (WSFC) that require highly available cluster shared volumes (CSV).
