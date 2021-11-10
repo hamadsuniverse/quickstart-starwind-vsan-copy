@@ -165,6 +165,7 @@ Parameters:
     - m5.16xlarge
     - m5.24xlarge
     - m5.2xlarge
+    - m5.xlarge
     - m5.4xlarge
     - m5.8xlarge
     - m5.metal
@@ -254,7 +255,7 @@ Parameters:
     - z1d.6xlarge
     - z1d.metal
     ConstraintDescription: Must contain a valid instance type.
-    Default: m5.2xlarge
+    Default: m5.xlarge
     Description: Type of EC2 instance for the workload instances.
     Type: String
   SWVSANAMIOS:
@@ -569,7 +570,7 @@ Resources:
                     }
           - name: StarWindEBSVolumeConfig
             action: aws:runCommand
-            nextStep: StarWindVSANConfig
+            nextStep: CreateStarWindQuickStartDirectoryOnWitness
             onFailure: "step:signalfailure"
             inputs:
               DocumentName: AWS-RunPowerShellScript
@@ -587,10 +588,27 @@ Resources:
                     # Create partition using all space as D drive
                     New-Partition –DiskNumber 1 -DriveLetter D –UseMaximumSize
                     Format-Volume -DriveLetter D -FileSystem NTFS -Confirm:$false
+                    # Create folder in D drive to store the StarWind HA device image
+                    New-Item -ItemType Directory -Path D:\StarWind-QuickStart
 
+          - name: CreateStarWindQuickStartDirectoryOnWitness
+            action: aws:runCommand
+            nextStep: StarWindVSANConfig
+            onFailure: "step:signalfailure"
+            inputs:
+              DocumentName: AWS-RunPowerShellScript
+              InstanceIds:
+                - "{{swvsanWitnessInstanceId.InstanceId}}"
+              # CloudWatchOutputConfig:
+              #   CloudWatchOutputEnabled: "true"
+              #   CloudWatchLogGroupName: !Sub '/aws/Quick_Start/${AWS::StackName}'
+              Parameters:
+                commands:
+                  - |
+                    New-Item -ItemType Directory -Path C:\StarWind-QuickStart
           - name: StarWindVSANConfig
             action: aws:runCommand
-            nextStep: signalsuccess
+            nextStep: ConnectIscsiStarWindDevices
             onFailure: "step:signalfailure"
             inputs:
               DocumentName: AWS-RunPowerShellScript
@@ -602,23 +620,143 @@ Resources:
               Parameters:
                 commands:
                   - |
-                    $instanceId = Invoke-WebRequest -Uri http://169.254.169.254/latest/meta-data/instance-id -UseBasicParsing | Select -expand "Content"
+
+                    $currentNodeInstanceId = Invoke-WebRequest -Uri http://169.254.169.254/latest/meta-data/instance-id -UseBasicParsing | Select -expand "Content"
 
                     $otherNodeName   = "StarWind Node 2"
                     $otherNodeInstanceId = Get-EC2Instance -Filter @{Name="tag:qs-sw-vsan:parent-stack-name";Values="{{StackName}}"},@{Name="tag:Name";Values="$otherNodeName"} -Select 'Reservations.Instances.InstanceId'
+                    $WitnessNodeName   = "StarWind Witness"
+                    $witnessNodeInstanceId = Get-EC2Instance -Filter @{Name="tag:qs-sw-vsan:parent-stack-name";Values="{{StackName}}"},@{Name="tag:Name";Values="$WitnessNodeName"} -Select 'Reservations.Instances.InstanceId'
 
                     # Get node 1 Syncronization ENI IP
-                    $currentNodeSyncENIIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$instanceId"},@{Name="description";Values="Syncronization ENI"} -Select 'NetworkInterfaces.PrivateIpAddress'
+                    $currentNodeSyncENIIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$currentNodeInstanceId"},@{Name="description";Values="Syncronization ENI"} -Select 'NetworkInterfaces.PrivateIpAddress'
+                    # Get node 1 Management ENI IP
+                    $currentNodeManagementENIIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$currentNodeInstanceId"},@{Name="description";Values="Management/Witness ENI"} -Select 'NetworkInterfaces.PrivateIpAddress'
                     # Get node 2 Syncronization ENI IP
                     $otherNodeSyncENIIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$otherNodeInstanceId"},@{Name="description";Values="Syncronization ENI"} -Select 'NetworkInterfaces.PrivateIpAddress'
+                    # Get node 2 Management ENI IP
+                    $otherNodeManagementENIIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$otherNodeInstanceId"},@{Name="description";Values="Management/Witness ENI"} -Select 'NetworkInterfaces.PrivateIpAddress'
 
-                    # Create the HA Device with default small size (faster)
-                    &"C:\Program Files\StarWind Software\StarWind\StarWindX\Samples\powershell\CreateHA_2.ps1" -addr $currentNodeSyncENIIp -addr2 $otherNodeSyncENIIp -imagePath "D:\" -imagePath2 "D:\" -failover 1 -cacheMode $null
+                    # Get witness node Management ENI IP
+                    $witnessNodeManagementENIIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$witnessNodeInstanceId"},@{Name="description";Values="Management/Witness ENI"} -Select 'NetworkInterfaces.PrivateIpAddress'
+
+                    $first_node_csv   = "iqn.2008-08.com.starwindsoftware:" + "{{Node1Name}}".ToLower() + "-csv"
+                    $second_node_csv  = "iqn.2008-08.com.starwindsoftware:" + "{{Node2Name}}".ToLower() + "-csv"
+                    $witness_node_csv = "iqn.2008-08.com.starwindsoftware:" + "{{WitnessNodeName}}".ToLower() + "-csv"
+                    &"C:\Program Files\StarWind Software\StarWind\StarWindX\Samples\powershell\Create_HA_Node_Majority.ps1" -addr $currentNodeManagementENIIp -addr2 $otherNodeManagementENIIp -addrW $witnessNodeManagementENIIp -syncInterface "#p2=${otherNodeSyncENIIp}:3260;#p3=${witnessNodeManagementENIIp}:3260" -syncInterface2 "#p1=${currentNodeSyncENIIp}:3260;#p3=${witnessNodeManagementENIIp}:3260" -syncInterfaceW "#p1=${currentNodeManagementENIIp}:3260;#p2=${otherNodeManagementENIIp}:3260" -imagePath "D:\StarWind-QuickStart" -imagePath2 "D:\StarWind-QuickStart" -imagePathW "C:\StarWind-QuickStart" -targetAlias "csv" -targetAlias2 "csv" -targetAliasW "csv" -targetName $first_node_csv -targetName2 $second_node_csv -targetNameW $witness_node_csv -cacheMode $null
 
                     $freeDiskSpace =  Get-PSDrive D | Select-Object @{Expression={$_.Free/1MB}} | Select -expand '$_.Free/1MB'
                     # Extend the HA device to the full size of the volume
                     &"C:\Program Files\StarWind Software\StarWind\StarWindX\Samples\powershell\ExtendDevice.ps1" -addr $currentNodeSyncENIIp -deviceName "HAImage1" -extendSize $freeDiskSpace
 
+          - name: ConnectIscsiStarWindDevices
+            action: aws:runCommand
+            nextStep: CreateVolumeOnIscsiStarWindDevices
+            onFailure: "step:signalfailure"
+            inputs:
+              DocumentName: AWS-RunPowerShellScript
+              InstanceIds:
+                - "{{swvsanNode1InstanceId.InstanceId}}"
+                - "{{swvsanNode2InstanceId.InstanceId}}"
+              # CloudWatchOutputConfig:
+              #   CloudWatchOutputEnabled: "true"
+              #   CloudWatchLogGroupName: !Sub '/aws/Quick_Start/${AWS::StackName}'
+              Parameters:
+                commands:
+                  - |
+                    $first_node_csv   = "iqn.2008-08.com.starwindsoftware:" + "{{Node1Name}}".ToLower() + "-csv"
+                    $second_node_csv  = "iqn.2008-08.com.starwindsoftware:" + "{{Node2Name}}".ToLower() + "-csv"
+
+                    $node1InstanceId = Get-EC2Instance -Filter @{Name="tag:qs-sw-vsan:parent-stack-name";Values="{{StackName}}"},@{Name="tag:Name";Values="StarWind Node 1"} -Select 'Reservations.Instances.InstanceId'
+                    $node2InstanceId = Get-EC2Instance -Filter @{Name="tag:qs-sw-vsan:parent-stack-name";Values="{{StackName}}"},@{Name="tag:Name";Values="StarWind Node 2"} -Select 'Reservations.Instances.InstanceId'
+
+                    $node1IscsiIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$node1InstanceId"},@{Name="description";Values="iSCSI ENI"} -Select 'NetworkInterfaces.PrivateIpAddress'
+                    $node2IscsiIp = Get-EC2NetworkInterface -Filter @{Name="attachment.instance-id";Values="$node2InstanceId"},@{Name="description";Values="iSCSI ENI"} -Select 'NetworkInterfaces.PrivateIpAddress'
+
+                    $currentNodeInstanceId = Invoke-WebRequest -Uri http://169.254.169.254/latest/meta-data/instance-id -UseBasicParsing | Select -expand "Content"
+
+                    if ($currentNodeInstanceId -eq $node1InstanceId) {
+                      $sourceIscsiIP      = $node1IscsiIp
+                      $destinationIscsiIp = $node2IscsiIp
+                      $currentNodeIscsiAddress  = $first_node_csv
+                      $otherNodeIscsiAddress    = $second_node_csv
+                    }
+                    elseif ($currentNodeInstanceId -eq $node2InstanceId)
+                    {
+                      $sourceIscsiIP      = $node2IscsiIp
+                      $destinationIscsiIp = $node1IscsiIp
+                      $currentNodeIscsiAddress  = $second_node_csv
+                      $otherNodeIscsiAddress    = $first_node_csv
+                    }
+
+                    New-IscsiTargetPortal -TargetPortalAddress 127.0.0.1 -TargetPortalPortNumber 3260
+                    New-IscsiTargetPortal -TargetPortalAddress $destinationIscsiIp  -TargetPortalPortNumber 3260 -InitiatorPortalAddress $sourceIscsiIP
+
+                    Connect-IscsiTarget -NodeAddress $currentNodeIscsiAddress -TargetPortalAddress 127.0.0.1 -TargetPortalPortNumber 3260 -IsMultipathEnabled $true -IsPersistent $true
+                    Connect-IscsiTarget -NodeAddress $otherNodeIscsiAddress -TargetPortalAddress $destinationIscsiIp -InitiatorPortalAddress $sourceIscsiIP -TargetPortalPortNumber 3260 -IsMultipathEnabled $true -IsPersistent $true
+
+                    Set-MSDSMGlobalDefaultLoadBalancePolicy -Policy LQD
+
+                    # print currently configured iscsi targets
+                    Get-IscsiTarget
+          - name: CreateVolumeOnIscsiStarWindDevices
+            action: aws:runCommand
+            nextStep: renameStorageNode1EC2
+            onFailure: "step:signalfailure"
+            inputs:
+              DocumentName: AWS-RunPowerShellScript
+              InstanceIds:
+                - "{{swvsanNode1InstanceId.InstanceId}}"
+              # CloudWatchOutputConfig:
+              #   CloudWatchOutputEnabled: "true"
+              #   CloudWatchLogGroupName: !Sub '/aws/Quick_Start/${AWS::StackName}'
+              Parameters:
+                commands:
+                  - |
+                    $device2ID = Get-Content D:\StarWind-QuickStart\HAimage2.swdsk | Select-Object -Index 7
+
+                    $device2ID = $device2ID -replace "<serial_id>", "" -replace "</serial_id>", ""
+
+                    $device2ID = $device2ID.Trim()
+
+                    $disk2 = Get-Disk | Where-Object SerialNumber -eq $device2ID | Initialize-Disk -PartitionStyle GPT
+
+                    $diskselection2 = Get-Disk | Where-Object SerialNumber -eq $device2ID | foreach Number
+
+                    New-Volume -FriendlyName CSV -DiskNumber $diskselection2 -FileSystem NTFS -AllocationUnitSize 4096
+          - name: renameStorageNode1EC2
+            action: 'aws:executeAwsApi'
+            nextStep: renameStorageNode2EC2
+            inputs:
+              Service: ec2
+              Api: CreateTags
+              Resources:
+                - '{{swvsanNode1InstanceId.InstanceId}}'
+              Tags:
+                - Key: Name
+                  Value: '{{Node1Name}}'
+          - name: renameStorageNode2EC2
+            action: 'aws:executeAwsApi'
+            nextStep: renameWitnessNodeEC2
+            inputs:
+              Service: ec2
+              Api: CreateTags
+              Resources:
+                - '{{swvsanNode2InstanceId.InstanceId}}'
+              Tags:
+                - Key: Name
+                  Value: '{{Node2Name}}'
+          - name: renameWitnessNodeEC2
+            action: 'aws:executeAwsApi'
+            nextStep: signalsuccess
+            inputs:
+              Service: ec2
+              Api: CreateTags
+              Resources:
+                - '{{swvsanWitnessInstanceId.InstanceId}}'
+              Tags:
+                - Key: Name
+                  Value: '{{WitnessNodeName}}'
             # If all steps complete successfully signals CFN of Success
           - name: "signalsuccess"
             action: "aws:executeAwsApi"
@@ -669,6 +807,7 @@ Resources:
                 Action:
                   - ec2:DescribeInstances
                   - ec2:DescribeInstanceStatus
+                  - ec2:CreateTags
                   - ssm:DescribeInstanceInformation
                   - ssm:ListCommands
                   - ssm:ListCommandInvocations

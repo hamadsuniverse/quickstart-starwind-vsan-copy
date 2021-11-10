@@ -44,7 +44,7 @@ Resources:
       GroupId: !GetAtt ManagementENISG.GroupId
       IpProtocol: tcp
       SourceSecurityGroupId: !GetAtt ManagementENISG.GroupId
-      FromPort: 3261
+      FromPort: 3260
       ToPort: 3261
   ManagementEniAllowRDPCommunicationRule:
     Type: AWS::EC2::SecurityGroupIngress
@@ -97,7 +97,7 @@ Resources:
       IpProtocol: tcp
       SourceSecurityGroupId: !GetAtt ISCSIENISG.GroupId
       FromPort: 3260
-      ToPort: 3260
+      ToPort: 3261
 Outputs:
   ManagementENISGId:
     Value: !GetAtt ManagementENISG.GroupId

@@ -189,6 +189,7 @@ Parameters:
     - m5.16xlarge
     - m5.24xlarge
     - m5.2xlarge
+    - m5.xlarge
     - m5.4xlarge
     - m5.8xlarge
     - m5.metal
@@ -278,7 +279,7 @@ Parameters:
     - z1d.6xlarge
     - z1d.metal
     ConstraintDescription: Must contain valid instance type.
-    Default: m5.2xlarge
+    Default: m5.xlarge
     Description: Type of EC2 instance for the workload instances.
     Type: String
   SWVSANAMIOS:
@@ -337,8 +338,8 @@ Rules:
 Mappings:
   AMI:
     Alias:
-      WindowsServer2019: /aws/service/marketplace/prod-2kn75c3qalr2u/8.0.0.13586
-      WindowsServer2016: /aws/service/marketplace/prod-u6mi75plvwbtw/8.0.0.13586
+      WindowsServer2019: /aws/service/marketplace/prod-2kn75c3qalr2u/latest
+      WindowsServer2016: /aws/service/marketplace/prod-u6mi75plvwbtw/latest
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   IsStorageNode: !Equals [!Ref NodeOrWitness, 'Storage Node']
