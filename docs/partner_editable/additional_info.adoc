@@ -5,9 +5,9 @@
 == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
 
-After the deployment, the following steps should be performed:
+After the deployment, the following steps can be performed to configure a Windows Server Failover Cluster:
 
-1. Deploy the Failover Cluster, set the required name and a static IP address for it. To create a Failover Cluster, please refer to the StarWind VSAN technical guide "Creating a Failover Cluster in Windows Server" section: https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3  
+1. Deploy the Failover Cluster, set the required name and static IP addresses for it. Add any additional IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 Storage instances. To create a Failover Cluster, please refer to the StarWind VSAN technical guide "Creating a Failover Cluster in Windows Server" section: https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3
 2. Add StarWind HA device to cluster. In Failover Cluster Manager, navigate to Cluster -> Storage -> Disks. Click Add Disk in the Actions panel, choose StarWind disks from the list and confirm the selection.
 3. If it is required to use StarWind HA device as a cluster shared volume (CSV), right-click the disk and select Add to Cluster Shared Volumes.
 4. Setup the Failover Cluster quorum. Create an SMB file share on the StarWind VSAN EC2 Witness instance that will host the file share witness for the Failover Cluster.
@@ -30,9 +30,9 @@ The following tests can be performed to test the deployment:
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
 
 
-With limited control access to the hardware in cloud environments, it is recommended to create StarWind HA devices with Node Majority failover strategy which eliminates the risk of Split Brain in case of network connectivity loss between StarWind VSAN EC2 Storage instances and allows withstanding a StarWind VSAN EC2 instance failure: https://www.starwindsoftware.com/resource-library/starwind-witness-node/
+With limited control access to the hardware in cloud environments, it is recommended to create StarWind HA devices with Node Majority failover strategy which eliminates the risk of Split Brain in case of network connectivity loss between StarWind VSAN EC2 Storage instances and allows withstanding a StarWind VSAN EC2 instance failure. This QuickStart follows this best practice. For more information: https://www.starwindsoftware.com/resource-library/starwind-witness-node/
 
-Every StarWind VSAN deployment must be validated by StarWind Support Engineer. This is to ensure that the setup is configured optimally depending on the application requirements. Additionally, StarWind Support team assists with Failover Cluster setup validation and settings optimization. Therefore, we highly recommend contacting StarWind Support after configuring SMB witness and creating a Failover Cluster. To contact StarWind Support, please use the following form: https://www.starwindsoftware.com/support-form
+Every StarWind VSAN deployment must be validated by StarWind Support Engineer. This is to ensure that the setup is configured optimally depending on the application requirements. Additionally, StarWind Support team can assist with Failover Cluster setup validation and settings optimization. Therefore, we highly recommend contacting StarWind Support after configuring SMB witness and creating a Failover Cluster. To contact StarWind Support, please use the following form: https://www.starwindsoftware.com/support-form
 
 == Security
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
