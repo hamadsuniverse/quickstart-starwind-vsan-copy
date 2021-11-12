@@ -5,13 +5,13 @@
 == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
 
-After the deployment, the following steps should be performed:
+After the deployment, the following steps can be performed to configure a Windows Server Failover Cluster:
 
-1. Deploy the Failover Cluster, set the required name and a static IP address for it. To create a Failover Cluster, please refer to the StarWind VSAN technical guide "Creating a Failover Cluster in Windows Server" section: https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3  
+1. Deploy the Failover Cluster, set the required name and static IP addresses for it. Add any additional IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 Storage instances. To create a Failover Cluster, please refer to https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3[Creating a Failover Cluster in Windows Server] in the StarWind VSAN technical guide.
 2. Add StarWind HA device to cluster. In Failover Cluster Manager, navigate to Cluster -> Storage -> Disks. Click Add Disk in the Actions panel, choose StarWind disks from the list and confirm the selection.
 3. If it is required to use StarWind HA device as a cluster shared volume (CSV), right-click the disk and select Add to Cluster Shared Volumes.
 4. Setup the Failover Cluster quorum. Create an SMB file share on the StarWind VSAN EC2 Witness instance that will host the file share witness for the Failover Cluster.
-5. After this, configure file share witness. For this, right-click the cluster node, navigate to More Actions -> Configure Cluster Quorum Settings and click Next. 
+5. After this, configure file share witness. For this, right-click the cluster node, navigate to More Actions -> Configure Cluster Quorum Settings and click Next.
 6. Select the quorum witness and click next.
 7. Select All Nodes (both StarWind VSAN EC2 Storage instances) and click Next.
 8. Select Configure a file share witness and click Next.
@@ -23,25 +23,25 @@ After the deployment, the following steps should be performed:
 // If steps are required to test the deployment, add them here. If not, remove the heading
 The following tests can be performed to test the deployment:
 
-1. In case StarWind HA device is used as a CSV, create a test VM (can be created without OS), place it on StarWind HA CSV and make sure the VM is able to live migrate. 
-2. Shut down one of the StarWind VSAN EC2 Storage instances and make sure that a test VM or role is able to failover to a partner instance. To perform this, follow the steps described in the following article: https://knowledgebase.starwindsoftware.com/maintenance/how-to-restartshutdown-servers-with-starwind-vsan-installed/  
+1. In case StarWind HA device is used as a CSV, create a test VM (can be created without OS), place it on StarWind HA CSV and make sure the VM is able to live migrate.
+2. Shut down one of the StarWind VSAN EC2 Storage instances and make sure that a test VM or role is able to failover to a partner instance. To perform this, follow the steps described in https://knowledgebase.starwindsoftware.com/maintenance/how-to-restartshutdown-servers-with-starwind-vsan-installed/[How to restart/shutdown servers with StarWind VSAN installed].
 
 == Best practices for using StarWind VSAN on AWS
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
 
 
-With limited control access to the hardware in cloud environments, it is recommended to create StarWind HA devices with Node Majority failover strategy which eliminates the risk of Split Brain in case of network connectivity loss between StarWind VSAN EC2 Storage instances and allows withstanding a StarWind VSAN EC2 instance failure: https://www.starwindsoftware.com/resource-library/starwind-witness-node/   
+With limited control access to the hardware in cloud environments, it is recommended to create StarWind HA devices with Node Majority failover strategy which eliminates the risk of Split Brain in case of network connectivity loss between StarWind VSAN EC2 Storage instances and allows withstanding a StarWind VSAN EC2 instance failure. This QuickStart follows this best practice. For more information, see https://www.starwindsoftware.com/resource-library/starwind-witness-node/[StarWind Witness].
 
-Every StarWind VSAN deployment must be validated by StarWind Support Engineer. This is to ensure that the setup is configured optimally depending on the application requirements. Additionally, StarWind Support team assists with Failover Cluster setup validation and settings optimization. Therefore, we highly recommend contacting StarWind Support after configuring SMB witness and creating a Failover Cluster. To contact StarWind Support, please use the following form: https://www.starwindsoftware.com/support-form
+Every StarWind VSAN deployment must be validated by StarWind Support Engineer. This is to ensure that the setup is configured optimally depending on the application requirements. Additionally, StarWind Support team can assist with Failover Cluster setup validation and settings optimization. Therefore, we highly recommend contacting StarWind Support after configuring SMB witness and creating a Failover Cluster. To contact StarWind Support, please use https://www.starwindsoftware.com/support-form[this form].
 
 == Security
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
 
-It is recommended not to backup the StarWind EC2 instances themselves but only data or workloads running on top of them. In case it is required to backup a StarWind VSAN EC2 instance, maintenance mode must be enabled: https://www.starwindsoftware.com/help/MaintenanceMode.html
+It is recommended not to backup the StarWind EC2 instances themselves but only data or workloads running on top of them. In case it is required to backup a StarWind VSAN EC2 instance, https://www.starwindsoftware.com/help/MaintenanceMode.html[maintenance mode] must be enabled.
 
-For additional information on backups, please refer to StarWind VSAN Backup Best Practices: https://www.starwindsoftware.com/best-practices/starwind-virtual-san-backup-best-practices/   
+For additional information on backups, please refer to https://www.starwindsoftware.com/best-practices/starwind-virtual-san-backup-best-practices/[StarWind VSAN Backup Best Practices].
 
 == Other useful information
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
 
-In case it is required to migrate the on-premises physical servers or VMs to AWS, StarWind P2V/V2V Free Converter can be used: https://www.starwindsoftware.com/starwind-v2v-converter   
+In case it is required to migrate the on-premises physical servers or VMs to AWS, StarWind P2V/V2V Free Converter can be used: https://www.starwindsoftware.com/starwind-v2v-converter
