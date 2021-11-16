@@ -38,7 +38,7 @@ The following tests can be performed to confirm that the Failover Cluster is ope
 
 Make sure that the tests above are successful for both StarWind VSAN EC2 Storage instances.   
 
-Once the tests above have passed succesfully, you can deploy a required VM or role and proceed with workload testing. This can include live migration, failover and general operation and performance tests.
+Once the tests above have passed successfully, you can deploy your required application, role or VM and proceed with workload testing. This can include live migration, failover and general operation and performance tests.
 
 == Best practices for using StarWind VSAN on AWS
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
