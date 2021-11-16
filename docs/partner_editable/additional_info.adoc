@@ -29,7 +29,7 @@ After the deployment, the following steps should be performed:
 10. Check the summary page and click Finish to complete the quorum settings
 
 
-== Post-deployment testing
+=== Failover Cluster simple testing
 // If steps are required to test the deployment, add them here. If not, remove the heading
 The following tests can be performed to confirm that the Failover Cluster is operating properly:
 
