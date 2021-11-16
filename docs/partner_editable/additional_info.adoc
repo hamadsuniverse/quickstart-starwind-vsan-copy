@@ -15,6 +15,8 @@ To test that the deployment has been successful, perform the following steps:
 == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
 
+=== Configure Windows Server Failover Cluster
+
 After the deployment, the following steps should be performed:
 
 1. Deploy the Failover Cluster, set the required name and a static IP address for it. To create a Failover Cluster, please refer to the StarWind VSAN technical guide "Creating a Failover Cluster in Windows Server" section: https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3  
