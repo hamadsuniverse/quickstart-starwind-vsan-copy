@@ -58,4 +58,4 @@ For additional information on backups, please refer to StarWind VSAN Backup Best
 == Other useful information
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
 
-It is also possible to connect other EC2 instances to use the StarWind HA storage. For this, please add a dedicated network interface for storage discovery via iSCSI on each additional EC2 instance and use it to connect storage from StarWind VSAN EC2 Storage instances.      
+It is also possible to connect other EC2 instances to use the StarWind HA storage. For this, it is recommended to add a separate Elastic Network Interface (ENI) for storage discovery via iSCSI on each additional EC2 instance and use it to connect storage from StarWind VSAN EC2 Storage instances. Storage connections - wether originating from a separate iSCSI ENI or a single/default ENI - should be directed towards the StarWind VSAN EC2 Storage instances' iSCSI ENI. You can identify the correct ENI from its description in the AWS Console.       
