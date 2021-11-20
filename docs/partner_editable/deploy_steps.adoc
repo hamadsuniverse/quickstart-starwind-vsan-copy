@@ -12,13 +12,13 @@ This Quick Start requires a subscription to the AMI for {partner-product-short-n
 . Sign in to your AWS account.
 . Open the page for the desired {partner-product-short-name} option below, and then choose *Continue to Subscribe*.
 +
-// [cols="3,1"]
+[cols="1"]
 |===
 ^|{marketplace_listing_url}[{marketplace_listing_name} AMI in AWS Marketplace^]
 ^|{marketplace_listing_url_2}[{marketplace_listing_name_2} AMI in AWS Marketplace^]
 |===
 
-. Review the terms and conditions for software usage, and then choose *Accept Terms*. +
+. Review the terms and conditions for software usage, and then choose *Accept Terms*.
   A confirmation page loads, and an email confirmation is sent to the account owner. For detailed subscription instructions, see the https://aws.amazon.com/marketplace/help/200799470[AWS Marketplace documentation^].
 
 . When the subscription process is complete, exit out of AWS Marketplace without further action. *Do not* provision the software from AWS Marketplace—the Quick Start deploys the AMI for you.
