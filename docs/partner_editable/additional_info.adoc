@@ -1,11 +1,21 @@
 // Add steps as necessary for accessing the software, post-configuration, and testing. Don’t include full usage instructions for your software, but add links to your product documentation for that information.
 //Should any sections not be applicable, remove them
 
+== Test the deployment
+
+To test that the deployment has been successful, perform the following steps:
+
+1.	Establish an RDP connection to both StarWind VSAN EC2 Storage instances and Witness instance.
+2.	On StarWind VSAN EC2 Storage and Witness instances, open StarWind Management Console, and connect the instances using their management IP addresses or DNS names. 
+3.	Verify that StarWind HA device is synchronized on both Storage instances and on the Witness instance, its mode is set to Witness. 
+4.	Verify that the Health Status of StarWind HA device displays “Storage is working properly” on all three instances. 
+5.	On both StarWind VSAN EC2 Storage instances, navigate to Disk Management and verify that the CSV disk is present and healthy. 
+
 
 == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
 
-After the deployment, the following steps can be performed to configure a Windows Server Failover Cluster:
+=== Configure Windows Server Failover Cluster
 
 1. Deploy the Failover Cluster, set the required name and static IP addresses for it. Add any additional IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 Storage instances. To create a Failover Cluster, please refer to https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3[Creating a Failover Cluster in Windows Server] in the StarWind VSAN technical guide.
 2. Add StarWind HA device to cluster. In Failover Cluster Manager, navigate to Cluster -> Storage -> Disks. Click Add Disk in the Actions panel, choose StarWind disks from the list and confirm the selection.
@@ -19,20 +29,22 @@ After the deployment, the following steps can be performed to configure a Window
 10. Check the summary page and click Finish to complete the quorum settings
 
 
-== Test the deployment
+=== Failover Cluster simple testing
 // If steps are required to test the deployment, add them here. If not, remove the heading
-The following tests can be performed to test the deployment:
+The following tests can be performed to confirm that the Failover Cluster is operating properly:
 
-1. In case StarWind HA device is used as a CSV, create a test VM (can be created without OS), place it on StarWind HA CSV and make sure the VM is able to live migrate.
+1. In case StarWind HA device is used as a cluster shared volume (CSV), create a test VM (can be created without OS), place it on StarWind HA CSV and make sure the VM is able to live migrate. 
 2. Shut down one of the StarWind VSAN EC2 Storage instances and make sure that a test VM or role is able to failover to a partner instance. To perform this, follow the steps described in https://knowledgebase.starwindsoftware.com/maintenance/how-to-restartshutdown-servers-with-starwind-vsan-installed/[How to restart/shutdown servers with StarWind VSAN installed].
+
+Make sure that the tests above are successful for both StarWind VSAN EC2 Storage instances.   
+
+Once the tests above have passed successfully, you can deploy your required application, role or VM and proceed with workload testing. This can include live migration, failover and general operation and performance tests.
 
 == Best practices for using StarWind VSAN on AWS
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
 
 
 With limited control access to the hardware in cloud environments, it is recommended to create StarWind HA devices with Node Majority failover strategy which eliminates the risk of Split Brain in case of network connectivity loss between StarWind VSAN EC2 Storage instances and allows withstanding a StarWind VSAN EC2 instance failure. This QuickStart follows this best practice. For more information, see https://www.starwindsoftware.com/resource-library/starwind-witness-node/[StarWind Witness].
-
-Every StarWind VSAN deployment must be validated by StarWind Support Engineer. This is to ensure that the setup is configured optimally depending on the application requirements. Additionally, StarWind Support team can assist with Failover Cluster setup validation and settings optimization. Therefore, we highly recommend contacting StarWind Support after configuring SMB witness and creating a Failover Cluster. To contact StarWind Support, please use https://www.starwindsoftware.com/support-form[this form].
 
 == Security
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
@@ -44,4 +56,4 @@ For additional information on backups, please refer to https://www.starwindsoftw
 == Other useful information
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
 
-In case it is required to migrate the on-premises physical servers or VMs to AWS, StarWind P2V/V2V Free Converter can be used: https://www.starwindsoftware.com/starwind-v2v-converter
+It is also possible to connect other EC2 instances to use the StarWind HA storage. For this, it is recommended to add a separate Elastic Network Interface (ENI) for storage discovery via iSCSI on each additional EC2 instance and use it to connect storage from StarWind VSAN EC2 Storage instances. Storage connections - wether originating from a separate iSCSI ENI or a single/default ENI - should be directed towards the StarWind VSAN EC2 Storage instances' iSCSI ENI. You can identify the correct ENI from its description in the AWS Console.       
