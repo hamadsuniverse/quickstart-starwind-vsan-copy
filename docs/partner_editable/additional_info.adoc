@@ -15,7 +15,7 @@ To test that the deployment has been successful, perform the following steps:
 == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
 
-After the deployment, the following steps can be performed to configure a Windows Server Failover Cluster:
+=== Configure Windows Server Failover Cluster
 
 1. Deploy the Failover Cluster, set the required name and static IP addresses for it. Add any additional IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 Storage instances. To create a Failover Cluster, please refer to https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3[Creating a Failover Cluster in Windows Server] in the StarWind VSAN technical guide.
 2. Add StarWind HA device to cluster. In Failover Cluster Manager, navigate to Cluster -> Storage -> Disks. Click Add Disk in the Actions panel, choose StarWind disks from the list and confirm the selection.
