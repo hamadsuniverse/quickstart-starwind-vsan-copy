@@ -2,14 +2,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description:
   This template deploys an EC2 instnace using the StarWind VSAN
   Marketplace AMI in an existing VPC. It also creates a total of 3 Elastic Network
-  Interfaces (ENIs) and attaches them to the instance.
+  Interfaces (ENIs) and attaches them to the instance. (qs-1sgqsed26)
 Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W9006
   AWS::CloudFormation::Interface:
     ParameterGroups:
     - Label:
         default: Network configuration
       Parameters:
-      - VPCID
       - PrivateSubnetID
       - ISCSIENIPrivateIP
       - ISCSIENISGId
@@ -28,12 +31,7 @@ Metadata:
       - KeyPairName
       - SWVSANEC2IAMInstanceProfile
       - SWVSANEC2IAMInstanceUserData
-    - Label:
-        default: AWS Quick Start configuration
-      Parameters:
-      - QSS3BucketName
-      - QSS3BucketRegion
-      - QSS3KeyPrefix
+      - SWVSANAMIOS
     ParameterLabels:
       KeyPairName:
         default: SSH key name
@@ -51,14 +49,6 @@ Metadata:
         default: Syncronization private IP address
       SyncronizationENISGId:
         default: Syncronization ENI Security Group ID
-      QSS3BucketName:
-        default: Quick Start S3 bucket name
-      QSS3BucketRegion:
-        default: Quick Start S3 bucket region
-      QSS3KeyPrefix:
-        default: Quick Start S3 key prefix
-      VPCID:
-        default: VPC ID
       WorkloadInstanceType:
         default: Workload instance type
       SWVSANStorageVolumeSize:
@@ -71,6 +61,8 @@ Metadata:
         default: IAM Instance Profile
       SWVSANEC2IAMInstanceUserData:
         default: EC2 Instance User Data Profile
+      SWVSANAMIOS:
+        default: Version of Windows to use for the instance
       ParentStackName:
         default: Parent CloudFormation Stack Name
 Parameters:
@@ -90,6 +82,7 @@ Parameters:
   ISCSIENISGId:
     Default: default
     Type: String
+    Description: Security group for the iSCSI ENI
   ManagementENIPrivateIP:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 0.0.0.0
@@ -98,6 +91,7 @@ Parameters:
   ManagementENISGId:
     Default: default
     Type: String
+    Description: Security group for the management ENI
   SyncronizationENIPrivateIP:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
     Default: 0.0.0.0
@@ -106,32 +100,7 @@ Parameters:
   SyncronizationENISGId:
     Default: default
     Type: String
-  QSS3BucketName:
-    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
-      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
-      (-).
-    Default: aws-quickstart
-    Description: S3 bucket name for the Quick Start assets. This string can include
-      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
-      or end with a hyphen (-).
-    Type: String
-  QSS3BucketRegion:
-    Default: 'us-east-1'
-    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
-    Type: String
-  QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slash (/).
-    Default: quickstart-examples/
-    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
-      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
-      forward slash (/).
-    Type: String
-  VPCID:
-    Description: ID of your existing VPC for deployment.
-    Type: AWS::EC2::VPC::Id
+    Description: Security group for the synchronization ENI
   WorkloadInstanceType:
     AllowedValues:
     - c5.12xlarge
@@ -299,6 +268,7 @@ Parameters:
   SWVSANEC2InstanceName:
     Type: String
     Default: StarWind Node X
+    Description: EC2 instance name
   NodeOrWitness:
     Type: String
     Description: Type of the StarWind instance to be created.
@@ -326,22 +296,12 @@ Rules:
           - Fn::RefAll: AWS::EC2::KeyPair::KeyName
           - ''
       AssertDescription: All key pair parameters must not be empty.
-  SubnetsInVPC:
-    Assertions:
-    - Assert:
-        Fn::EachMemberIn:
-        - Fn::ValueOfAll:
-          - AWS::EC2::Subnet::Id
-          - VpcId
-        - Fn::RefAll: AWS::EC2::VPC::Id
-      AssertDescription: All subnets must be in the VPC.
 Mappings:
   AMI:
     Alias:
       WindowsServer2019: /aws/service/marketplace/prod-2kn75c3qalr2u/latest
       WindowsServer2016: /aws/service/marketplace/prod-u6mi75plvwbtw/latest
 Conditions:
-  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   IsStorageNode: !Equals [!Ref NodeOrWitness, 'Storage Node']
   ISCSIENIPrivateIPSpecified: !Not [!Equals [!Ref ISCSIENIPrivateIP, 0.0.0.0 ]]
   ISCSIENISGIdSpecified: !Not [!Equals [!Ref ISCSIENISGId, default ]]

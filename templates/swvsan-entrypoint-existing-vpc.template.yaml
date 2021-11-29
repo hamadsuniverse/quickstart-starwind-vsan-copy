@@ -3,8 +3,18 @@ Description: This main template creates a multi-AZ deployment of a StarWind VSAN
   on AWS in an existing VPC. It deploys 3 StarWind VSAN EC2 instances.
   Two nodes and a witness.
   **WARNING** This template creates EC2 instances and related resources.
-  You will be billed for the AWS resources used if you create a stack from this template.
+  You will be billed for the AWS resources used if you create a stack from this template. (qs-1sgqsectt)
 Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W9006
+        - W9901
+        - E1029
+        - E9101
+  QuickStartDocumentation:
+    EntrypointName: "Parameters for deploying into an existing VPC"
+    Order: "2"
   AWS::CloudFormation::Interface:
     ParameterGroups:
     - Label:
@@ -43,7 +53,7 @@ Metadata:
       PrivateSubnetCID:
         default: Witness Subnet
       RDPSGID:
-        default: RDP instnace(s) security group
+        default: RDP instance(s) security group
       QSS3BucketName:
         default: Quick Start S3 bucket name
       QSS3BucketRegion:
@@ -780,6 +790,13 @@ Resources:
               UniqueId: "{{swvsanNode1InstanceId.InstanceId}}"
   SWVSANSSMIAMRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EIAMPolicyWildcardResource
+          ignore_reason:
+            - "Scope is limited appropriately"
     Properties:
       Policies:
         - PolicyDocument:
@@ -921,12 +938,6 @@ Resources:
           !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
         SyncronizationENISGId:
           !GetAtt SecurityGroupsStack.Outputs.SyncronizationENISGId
-        QSS3BucketName:
-          !Ref QSS3BucketName
-        QSS3BucketRegion:
-          !Ref QSS3BucketRegion
-        QSS3KeyPrefix:
-          !Ref QSS3KeyPrefix
         SWVSANStorageVolumeSize:
           !Ref SWVSANStorageVolumeSize
         SWVSANEC2InstanceName:

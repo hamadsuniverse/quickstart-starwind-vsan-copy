@@ -1,7 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description:
-  This template deploys 3 Security Groups used for StarWind VSAN EC2 instnace.
+  This template deploys 3 Security Groups used for StarWind VSAN EC2 instnace. (qs-1sgqsed2j)
 Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W9006
   AWS::CloudFormation::Interface:
     ParameterGroups:
     - Label:
@@ -24,7 +28,7 @@ Parameters:
   ParentStackName:
     Type: String
     Default: ""
-    Description: Parent Stack Name to tag the instane with. Used in Automation.
+    Description: Parent Stack Name to tag the instance with. Used in Automation.
   RDPSGID:
     Description: ID of your Remote Desktop instance(s) security group.
     Type: AWS::EC2::SecurityGroup::Id
