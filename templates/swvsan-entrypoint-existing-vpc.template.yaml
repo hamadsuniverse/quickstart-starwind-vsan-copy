@@ -907,12 +907,9 @@ Resources:
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
-        VPCID:
-          !Ref VPCID
-        ParentStackName:
-          !Sub ${AWS::StackName}
-        RDPSGID:
-          !Ref RDPSGID
+        VPCID: !Ref VPCID
+        ParentStackName: !Sub ${AWS::StackName}
+        RDPSGID: !Ref RDPSGID
   StorageNode1Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -922,28 +919,16 @@ Resources:
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
-        WorkloadInstanceType:
-          !Ref WorkloadInstanceType
-        SWVSANAMIOS:
-          !Ref SWVSANAMIOS
-        KeyPairName:
-          !Ref KeyPairName
-        VPCID:
-          !Ref VPCID
-        PrivateSubnetID:
-          !Ref PrivateSubnetAID
-        ISCSIENISGId:
-          !GetAtt SecurityGroupsStack.Outputs.ISCSIENISGId
-        ManagementENISGId:
-          !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
-        SyncronizationENISGId:
-          !GetAtt SecurityGroupsStack.Outputs.SyncronizationENISGId
-        SWVSANStorageVolumeSize:
-          !Ref SWVSANStorageVolumeSize
-        SWVSANEC2InstanceName:
-          'StarWind Node 1'
-        SWVSANEC2IAMInstanceProfile:
-          !Ref SWVSANEC2IAMInstanceProfile
+        WorkloadInstanceType: !Ref WorkloadInstanceType
+        SWVSANAMIOS: !Ref SWVSANAMIOS
+        KeyPairName: !Ref KeyPairName
+        PrivateSubnetID: !Ref PrivateSubnetAID
+        ISCSIENISGId: !GetAtt SecurityGroupsStack.Outputs.ISCSIENISGId
+        ManagementENISGId: !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
+        SyncronizationENISGId: !GetAtt SecurityGroupsStack.Outputs.SyncronizationENISGId
+        SWVSANStorageVolumeSize: !Ref SWVSANStorageVolumeSize
+        SWVSANEC2InstanceName: 'StarWind Node 1'
+        SWVSANEC2IAMInstanceProfile: !Ref SWVSANEC2IAMInstanceProfile
         SWVSANEC2IAMInstanceUserData: !Base64
           Fn::Join:
             - ''
@@ -963,8 +948,7 @@ Resources:
               - '}'
               - "\n"
               - "</powershell>\n"
-        ParentStackName:
-          !Sub ${AWS::StackName}
+        ParentStackName: !Sub ${AWS::StackName}
   StorageNode2Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -974,36 +958,17 @@ Resources:
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
-        WorkloadInstanceType:
-          !Ref WorkloadInstanceType
-        SWVSANAMIOS:
-          !Ref SWVSANAMIOS
-        KeyPairName:
-          !Ref KeyPairName
-        VPCID:
-          !Ref VPCID
-        PrivateSubnetID:
-          !Ref PrivateSubnetBID
-        ISCSIENISGId:
-          !GetAtt SecurityGroupsStack.Outputs.ISCSIENISGId
-        ManagementENISGId:
-          !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
-        SyncronizationENISGId:
-          !GetAtt SecurityGroupsStack.Outputs.SyncronizationENISGId
-        QSS3BucketName:
-          !Ref QSS3BucketName
-        QSS3BucketRegion:
-          !Ref QSS3BucketRegion
-        QSS3KeyPrefix:
-          !Ref QSS3KeyPrefix
-        SWVSANStorageVolumeSize:
-          !Ref SWVSANStorageVolumeSize
-        SWVSANEC2InstanceName:
-          'StarWind Node 2'
-        SWVSANEC2IAMInstanceProfile:
-          !Ref SWVSANEC2IAMInstanceProfile
-        ParentStackName:
-          !Sub ${AWS::StackName}
+        WorkloadInstanceType: !Ref WorkloadInstanceType
+        SWVSANAMIOS: !Ref SWVSANAMIOS
+        KeyPairName: !Ref KeyPairName
+        PrivateSubnetID: !Ref PrivateSubnetBID
+        ISCSIENISGId: !GetAtt SecurityGroupsStack.Outputs.ISCSIENISGId
+        ManagementENISGId: !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
+        SyncronizationENISGId: !GetAtt SecurityGroupsStack.Outputs.SyncronizationENISGId
+        SWVSANStorageVolumeSize: !Ref SWVSANStorageVolumeSize
+        SWVSANEC2InstanceName: 'StarWind Node 2'
+        SWVSANEC2IAMInstanceProfile: !Ref SWVSANEC2IAMInstanceProfile
+        ParentStackName: !Sub ${AWS::StackName}
   WitnessNodeStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -1014,32 +979,15 @@ Resources:
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
       Parameters:
         NodeOrWitness: Witness
-        WorkloadInstanceType:
-          !Ref WorkloadInstanceType
-        SWVSANAMIOS:
-          !Ref SWVSANAMIOS
-        KeyPairName:
-          !Ref KeyPairName
-        VPCID:
-          !Ref VPCID
-        PrivateSubnetID:
-          !Ref PrivateSubnetCID
-        ManagementENISGId:
-          !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
-        QSS3BucketName:
-          !Ref QSS3BucketName
-        QSS3BucketRegion:
-          !Ref QSS3BucketRegion
-        QSS3KeyPrefix:
-          !Ref QSS3KeyPrefix
-        SWVSANStorageVolumeSize:
-          !Ref SWVSANStorageVolumeSize
-        SWVSANEC2InstanceName:
-          'StarWind Witness'
-        SWVSANEC2IAMInstanceProfile:
-          !Ref SWVSANEC2IAMInstanceProfile
-        ParentStackName:
-          !Sub ${AWS::StackName}
+        WorkloadInstanceType: !Ref WorkloadInstanceType
+        SWVSANAMIOS: !Ref SWVSANAMIOS
+        KeyPairName: !Ref KeyPairName
+        PrivateSubnetID: !Ref PrivateSubnetCID
+        ManagementENISGId: !GetAtt SecurityGroupsStack.Outputs.ManagementENISGId
+        SWVSANStorageVolumeSize: !Ref SWVSANStorageVolumeSize
+        SWVSANEC2InstanceName: 'StarWind Witness'
+        SWVSANEC2IAMInstanceProfile: !Ref SWVSANEC2IAMInstanceProfile
+        ParentStackName: !Sub ${AWS::StackName}
 Outputs:
   StorageNode1ManagementIP:
     Description: Management IP Address of Storage Node 1
