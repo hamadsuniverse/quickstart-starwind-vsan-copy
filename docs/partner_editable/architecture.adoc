@@ -8,7 +8,7 @@ AWS Cloud.
 
 [#architecture1]
 .Quick Start architecture for {partner-product-short-name} on AWS
-image::../images/architecture_diagram.png[Architecture]
+image::../images/starwind_qs_architecture_diagram.png[Architecture]
 
 As shown in <<architecture1>>, the Quick Start sets up the following:
 
@@ -21,9 +21,16 @@ internet access for resources in the private subnets.*
 ** A Windows bastion host in an Auto Scaling group to allow inbound Secure
 Remote Desktop (RDP) access to EC2 instances in public and private subnets.*
 * In the private subnets:
-** 2 EC2 instances with 3 Network interfaces each. (StarWind VSAN EC2 storage instances)
-** 1 EC2 instance with 1 network interface. (StarWind VSAN EC2 Witness instance)
-// Add bullet points for any additional components that are included in the deployment. Make sure that the additional components are also represented in the architecture diagram. End each bullet with a period.
-// * <describe any additional components>.
+** Two StarWind VSAN EC2 storage instances (nodes 1 and 2) in Availability Zones 1 and 3. These storage instances <do what?______>. 
+** A StarWind VSAN EC2 witness instance in Availability Zone 2. This witness instance <does what?______>. 
+** Two iSCSI elastic network interfaces in Availability Zones 1 and 3. These network interfaces <do what?______>.
+** Three management/witness network interfaces in Availability Zones 1, 2, and 3, which <do what?______>.
+** Two synchronization network interfaces in Availability Zones 1 and 3. These network interfaces <do what?______>.
+
+//TODO Dave, In the diagram's public subnets, please add the NAT gateways, bastion host, and Auto Scaling group since we mention them in the bullets.
+
+//TODO Dave, In the diagram, only two of the management/witness network interfaces have arrows. What about the third one ... is an arrow maybe implied between it and storage node 1?
+
+//TODO Dave, In the bullet points above, please fill in the blanks.
 
 [.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
