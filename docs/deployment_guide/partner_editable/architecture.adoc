@@ -21,15 +21,14 @@ internet access for resources in the private subnets.*
 ** A Windows bastion host in an Auto Scaling group to allow inbound Secure
 Remote Desktop (RDP) access to EC2 instances in public and private subnets.*
 * In the private subnets:
-** Two StarWind VSAN EC2 storage instances (nodes 1 and 2) in Availability Zones 1 and 3. These storage instances <do what?______>. 
-** A StarWind VSAN EC2 witness instance in Availability Zone 2. This witness instance <does what?______>. 
-** Two iSCSI elastic network interfaces in Availability Zones 1 and 3. These network interfaces <do what?______>.
-** Three management/witness network interfaces in Availability Zones 1, 2, and 3, which <do what?______>.
-** Two synchronization network interfaces in Availability Zones 1 and 3. These network interfaces <do what?______>.
-
-//TODO Dave, In the diagram's public subnets, please add the NAT gateways, bastion host, and Auto Scaling group since we mention them in the bullets.
+** Two StarWind VSAN EC2 storage instances (nodes 1 and 2) in Availability Zones 1 and 3. These storage instances are clustered in a Windows Server Failover Cluster and comprise the VSAN. 
+** A StarWind VSAN EC2 witness instance in Availability Zone 2. This witness instance monitors the cluster in order to ensure failover takes place in case of a failure. 
+** Two iSCSI elastic network interfaces in Availability Zones 1 and 3. These network interfaces allow storage clients to access the VSAN storage.
+** Three management/witness network interfaces in Availability Zones 1, 2, and 3, which allow administrators management access to the cluster.
+** Two synchronization network interfaces in Availability Zones 1 and 3. These network interfaces are used to replicate the storage on the StarWind VSAN cluster.
 
 //TODO Dave, In the diagram, only two of the management/witness network interfaces have arrows. What about the third one ... is an arrow maybe implied between it and storage node 1?
+// I think it's implied, and adding additional arrows would make the diagram messy.
 
 //TODO Dave, In the bullet points above, please fill in the blanks.
 

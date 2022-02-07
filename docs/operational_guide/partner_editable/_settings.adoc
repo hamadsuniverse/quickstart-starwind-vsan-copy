@@ -1,9 +1,9 @@
-:quickstart-project-name: quickstart-repo-name
+:quickstart-project-name: quickstart-starwind-vsan
 :quickstart-github-org: aws-quickstart
-:partner-product-name: Full Product Name
-:partner-product-short-name: Product Name
-:partner-company-name: Example Company Name, Ltd.
-:doc-month: January
+:partner-product-name: StarWind Virtual SAN (VSAN)
+:partner-product-short-name: StarWind VSAN
+:partner-company-name: StarWind Software Inc.
+:doc-month: February
 :doc-year: 2022
 //:partner-contributors: John Smith, {partner-company-name}
 //:other-contributors: Akua Mansa, Trek10
