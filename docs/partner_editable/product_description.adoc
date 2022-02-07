@@ -1,9 +1,0 @@
-// Replace the content in <>
-// Briefly describe the software. Use consistent and clear branding.
-// Include the benefits of using the software on AWS, and provide details on usage scenarios.
-
-StarWind Virtual SAN (VSAN) is a Software-Defined Storage (SDS) solution that eliminates any need for physical shared storage by simply mirroring EBS volumes between Amazon Elastic Compute Cloud (Amazon EC2) instances. It shares the mirrored volumes via the iSCSI to be used as a shared and highly available storage for VMs, roles, applications and services in a clustered system. The mirrored storage can be accessed from the EC2 instances where StarWind VSAN is installed (hyperconverged scenario) or by other EC2 instances over iSCSI (converged scenario).
-
-StarWind VSAN performs synchronous (active-active) replication. Synchronous replication ensures that any data which is written to any StarWind EC2 instance is immediately replicated to the partner instance. Any write before being acknowledged to a client is first written to both EC2 instances. Since this is an active-active solution, both StarWind EC2 instances are available for writing and reading data simultaneously.
-
-By deploying StarWind VSAN on AWS over three Availability Zones, you can take advantage of the fault tolerance of multiple Availability Zones and the StarWind VSAN high-availability (HA) feature. The Quick Start automates the deployment and configuration of the operating system and application level tasks so that you can have a working HA iSCSI storage in minutes.
