@@ -1,5 +1,3 @@
-This Quick Start deploys {partner-product-name} on the AWS Cloud. If you are unfamiliar with AWS Quick Starts, see the https://aws-ia.github.io/content/qs_info.html[AWS Quick Start General Content Guide].
+This Quick Start deploys {partner-product-name} on the AWS Cloud. StarWind VSAN is a virtual storage area network (SAN) that spans multiple Availability Zones.
 
-This guide covers the steps necessary to deploy this Quick Start.
-
-// TODO Marcia: Spell out SAN. Align w language Dave and I worked out for the landing page.
+If you are unfamiliar with AWS Quick Starts, see the https://aws-ia.github.io/content/qs_info.html[AWS Quick Start General Content Guide^].
