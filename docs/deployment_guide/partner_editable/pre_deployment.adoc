@@ -2,17 +2,12 @@
 
 == Predeployment steps
 
-=== Subscribe to the {partner-product-short-name} AMI
-
-This Quick Start requires a subscription to the AMI for {partner-product-short-name} in AWS Marketplace. You will have to subscribe to the AMI that matches your operating system requirements. In general, it is recommended to select the latest operating system available.
+This Quick Start requires a subscription to the AMI for {partner-product-short-name} in AWS Marketplace. 
 
 . Sign in to your AWS account.
-. Open the page for the desired {partner-product-short-name} option below, and then choose *Continue to Subscribe*.
+. Open the page for the {partner-product-short-name} AMI that matches your operating system requirement, and choose the latest operating system available.
++
+* https://aws.amazon.com/marketplace/pp/prodview-j6vmh577hzixu?sr=0-4&ref_=beagle&applicationId=AWSMPContessa[StarWind Virtual SAN on Windows Server 2019^]
+* https://aws.amazon.com/marketplace/pp/prodview-sr2ikwn6wo4gw?sr=0-1&ref_=beagle&applicationId=AWSMPContessa[StarWind Virtual SAN on Windows Server 2016^]
 
-==== StarWind Virtual SAN on Windows Server 2019
-
-https://aws.amazon.com/marketplace/pp/prodview-j6vmh577hzixu?sr=0-4&ref_=beagle&applicationId=AWSMPContessa
-
-==== StarWind Virtual SAN on Windows Server 2016
-
-https://aws.amazon.com/marketplace/pp/prodview-sr2ikwn6wo4gw?sr=0-1&ref_=beagle&applicationId=AWSMPContessa
+. Choose *Continue to Subscribe*.

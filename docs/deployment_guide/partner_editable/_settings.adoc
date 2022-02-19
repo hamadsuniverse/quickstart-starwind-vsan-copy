@@ -5,7 +5,7 @@
 :partner-company-name: StarWind Software Inc.
 :doc-month: February
 :doc-year: 2022
-:partner-contributors: John Smith, {partner-company-name}
+:partner-contributors: Orest Lesyuk, {partner-company-name}
 //:other-contributors: Akua Mansa, Trek10
 :aws-contributors: Hamad Alkhal, AWS Professional Services team
 :aws-ia-contributors: Dave May, AWS Integration & Automation team

@@ -1,26 +1,40 @@
-//Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps leave this file empty.
-
 == Test the deployment
 
-To test that the deployment has been successful, perform the following steps:
+. Establish a Remote Desktop Protocol (RDP) connection to both StarWind VSAN EC2 storage instances and to the witness EC2 instance.
+. Open the StarWind Management Console on all three EC2 instances. Connect the instances using their management Internet Protocol addresses (IP addresses) or Domain Name System (DNS) names. 
+. Verify that the StarWind high-availability (HA) device is synchronized on all three instance and that its mode is set to *Witness*. 
+. Verify that the StarWind HA device has a health status of `Storage is working properly` on all three instances. 
+. On both storage instances, navigate to *Disk Management*, and verify that the cluster shared volume (CSV) disk is present and healthy. 
 
-1.	Establish an RDP connection to both StarWind VSAN EC2 Storage instances and Witness instance.
-2.	On StarWind VSAN EC2 Storage and Witness instances, open StarWind Management Console, and connect the instances using their management IP addresses or DNS names. 
-3.	Verify that StarWind HA device is synchronized on both Storage instances and on the Witness instance, its mode is set to Witness. 
-4.	Verify that the Health Status of StarWind HA device displays “Storage is working properly” on all three instances. 
-5.	On both StarWind VSAN EC2 Storage instances, navigate to Disk Management and verify that the CSV disk is present and healthy. 
+//TODO Dave, In step 3, what does "the StarWind high-availability (HA) device" refer to? We haven't used that term before. We should call it the same thing here that we've called it earlier.
+//TODO Dave, Do these steps give people enough information to accomplish each part of the testing?
+//TODO Dave, Have we referred to the CSV disk earlier by another name (in which case we should use the same name throughout), or is this something new that we've never mentioned before?
 
 == Postdeployment steps
 
-=== Configure Windows Server Failover Cluster
+Configure the Windows Server Failover Cluster as follows:
 
-1. Deploy the Failover Cluster, set the required name and static IP addresses for it. Add any additional IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 Storage instances. To create a Failover Cluster, please refer to https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3[Creating a Failover Cluster in Windows Server] in the StarWind VSAN technical guide.
-2. Add StarWind HA device to cluster. In Failover Cluster Manager, navigate to Cluster -> Storage -> Disks. Click Add Disk in the Actions panel, choose StarWind disks from the list and confirm the selection.
-3. If it is required to use StarWind HA device as a cluster shared volume (CSV), right-click the disk and select Add to Cluster Shared Volumes.
-4. Setup the Failover Cluster quorum. Create an SMB file share on the StarWind VSAN EC2 Witness instance that will host the file share witness for the Failover Cluster.
-5. After this, configure file share witness. For this, right-click the cluster node, navigate to More Actions -> Configure Cluster Quorum Settings and click Next.
-6. Select the quorum witness and click next.
-7. Select All Nodes (both StarWind VSAN EC2 Storage instances) and click Next.
-8. Select Configure a file share witness and click Next.
-9. Type the share path in the File Share Path field and click Next.
-10. Check the summary page and click Finish to complete the quorum settings
+. Deploy the failover cluster, setting the required name and static IP addresses for it. 
+
+. (Optional) Add IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 storage instances. For details, see https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3[Creating a Failover Cluster in Windows Server^] in the StarWind VSAN technical guide.
+. Add the StarWind HA device to the cluster. 
+.. In **Failover Cluster Manager**, navigate to *Cluster*, *Storage*, *Disks*. 
+.. In the *Actions* panel, choose *Add Disk*.
+.. Choose *StarWind disks* from the list, and confirm the selection.
+.. If you are using the StarWind HA device as a CSV disk, open the context (right-click) menu for the disk, and choose *Add to Cluster Shared Volumes*.
+. Set up the failover cluster quorum by creating a Server Message Block (SMB) file share on the StarWind VSAN EC2 witness instance that will host the file share witness for the failover cluster.
+. Add an inbound rule to the StarWind VSAN EC2 witness instance security group to allow SMB access from the storage-nodes management security group to allow failover cluster file share witness communication.
+. Configure file share witness. 
+.. Open the context (right-click) menu for the cluster node, navigate to *More Actions*, *Configure Cluster Quorum Settings*, and choose *Next*.
+.. Choose the quorum witness, and choose *Next*.
+.. Choose *All Nodes* (both StarWind VSAN EC2 Storage instances), and choose *Next*.
+.. Choose *Configure a file share witness*, and choose *Next*.
+.. In the *File Share Path* box, enter the share path, and choose *Next*.
+.. Review the summary page. Then choose *Finish*.
+
+//TODO Dave, In PR 25 (https://github.com/aws-quickstart/quickstart-starwind-vsan/pull/25/files), Hamad edited out all the references to the Windows Server Failover Cluster (or just "cluster") in the "Architecture" section, swapping in the terms "node" or "instance" instead. Please edit this section accordingly so that we use terms consistently throughout. Exception: The link text that points to the StarWind tech guide needs to copy that heading, so there we would keep the term "cluster".
+
+//TODO Dave, Now that I've edited these steps for readability and AWS style, please rereview them for accuracy and completeness. 
+
+//TODO Dave, Please rewrite step 5 ("Add an inbound rule...") for clarity. It's a long, confusing statement.
+ 
