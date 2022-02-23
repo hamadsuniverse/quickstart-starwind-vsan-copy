@@ -2,13 +2,9 @@
 
 . Establish a Remote Desktop Protocol (RDP) connection to both StarWind VSAN EC2 storage instances and to the witness EC2 instance.
 . Open the StarWind Management Console on all three EC2 instances. Connect the instances using their management Internet Protocol addresses (IP addresses) or Domain Name System (DNS) names. 
-. Verify that the StarWind high-availability (HA) device is synchronized on all three instance and that its mode is set to *Witness*. 
-. Verify that the StarWind HA device has a health status of `Storage is working properly` on all three instances. 
-. On both storage instances, navigate to *Disk Management*, and verify that the cluster shared volume (CSV) disk is present and healthy. 
-
-//TODO Dave, In step 3, what does "the StarWind high-availability (HA) device" refer to? We haven't used that term before. We should call it the same thing here that we've called it earlier.
-//TODO Dave, Do these steps give people enough information to accomplish each part of the testing?
-//TODO Dave, Have we referred to the CSV disk earlier by another name (in which case we should use the same name throughout), or is this something new that we've never mentioned before?
+. Verify that the witness instance is synchronized and that its mode is set to *Witness*. 
+. Verify that both storage instances (StarWind HA devices) have a health status of `Storage is working properly`. 
+. On both storage instances, navigate to *Disk Management* (in Windows, run `compmgmt.msc` and choose *Disk Management*). Verify that the Cluster Shared Volume (CSV) is present and healthy. For details, refer to https://docs.microsoft.com/en-us/windows-server/failover-clustering/failover-cluster-csvs[Use Cluster Shared Volumes in a failover cluster^].
 
 == Postdeployment steps
 
@@ -37,4 +33,3 @@ Configure the Windows Server Failover Cluster as follows:
 //TODO Dave, Now that I've edited these steps for readability and AWS style, please rereview them for accuracy and completeness. 
 
 //TODO Dave, Please rewrite step 5 ("Add an inbound rule...") for clarity. It's a long, confusing statement.
- 
