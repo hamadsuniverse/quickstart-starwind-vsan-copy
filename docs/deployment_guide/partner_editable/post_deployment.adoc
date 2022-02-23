@@ -19,7 +19,10 @@ Configure the Windows Server Failover Cluster as follows:
 .. Choose *StarWind disks* from the list, and confirm the selection.
 .. If you are using the StarWind HA device as a CSV disk, open the context (right-click) menu for the disk, and choose *Add to Cluster Shared Volumes*.
 . Set up the failover cluster quorum by creating a Server Message Block (SMB) file share on the StarWind VSAN EC2 witness instance that will host the file share witness for the failover cluster.
-. Add an inbound rule to the StarWind VSAN EC2 witness instance security group to allow SMB access from the storage-nodes management security group to allow failover cluster file share witness communication.
+. Add a Security Group rule to allow SMB access to the witness node.
+.. Open the https://console.aws.amazon.com/ec2/v2[EC2 management console] and select *Security Groups*.
+.. Select the security group associated with the EC2 witness instance and add a new inbound rule.
+.. Add a rule allowing port 445 TCP traffic from the security group associated with the storage instances.
 . Configure file share witness. 
 .. Open the context (right-click) menu for the cluster node, navigate to *More Actions*, *Configure Cluster Quorum Settings*, and choose *Next*.
 .. Choose the quorum witness, and choose *Next*.
@@ -30,6 +33,4 @@ Configure the Windows Server Failover Cluster as follows:
 
 //TODO Dave, In PR 25 (https://github.com/aws-quickstart/quickstart-starwind-vsan/pull/25/files), Hamad edited out all the references to the Windows Server Failover Cluster (or just "cluster") in the "Architecture" section, swapping in the terms "node" or "instance" instead. Please edit this section accordingly so that we use terms consistently throughout. Exception: The link text that points to the StarWind tech guide needs to copy that heading, so there we would keep the term "cluster".
 
-//TODO Dave, Now that I've edited these steps for readability and AWS style, please rereview them for accuracy and completeness. 
-
-//TODO Dave, Please rewrite step 5 ("Add an inbound rule...") for clarity. It's a long, confusing statement.
+//Marcia, that would be inaccurate. In StarWind parlance, each EC2 instance is a "node", however StarWind runs on top of a Windows Server Failover Cluster. These steps are taken within Windows management consoles rather than within the StarWind application, so they need to maintain the Windows verbiage.
