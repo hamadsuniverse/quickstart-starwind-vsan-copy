@@ -1,4 +1,6 @@
-== Test the deployment
+== Postdeployment steps
+
+=== Test the deployment
 
 . Establish a Remote Desktop Protocol (RDP) connection to both StarWind VSAN EC2 storage instances and to the witness EC2 instance.
 . Open the StarWind Management Console on all three EC2 instances. Connect the instances using their management Internet Protocol addresses (IP addresses) or Domain Name System (DNS) names. 
@@ -6,9 +8,7 @@
 . Verify that both storage instances (the StarWind HA devices) have a health status of `Storage is working properly`. 
 . On both storage instances, navigate to *Disk Management* (in Windows, run `compmgmt.msc` and choose *Disk Management*). Verify that the Cluster Shared Volume (CSV) is present and healthy. For details, refer to https://docs.microsoft.com/en-us/windows-server/failover-clustering/failover-cluster-csvs[Use Cluster Shared Volumes in a failover cluster^].
 
-== Postdeployment steps
-
-Create and configure your Windows Server Failover Cluster as follows:
+=== Create and configure your Windows Server Failover Cluster
 
 . Create the failover cluster, setting the required name and static IP addresses for it. For details, refer to https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3[Creating a Failover Cluster in Windows Server^] in the StarWind VSAN technical guide.
 
