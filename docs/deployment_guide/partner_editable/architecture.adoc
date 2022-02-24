@@ -16,9 +16,9 @@ best practices, to provide you with your own virtual network on AWS.*
 ** Managed network address translation (NAT) gateways to allow outbound
 internet access for resources in the private subnets.*
 ** A Windows bastion host in an Auto Scaling group to allow inbound secure
-Remote Desktop Gateway (RD Gateway) access to EC2 instances in public and private subnets.*
+Remote Desktop Gateway (RD Gateway) access to Amazon Elastic Compute Cloud (Amazon EC2) instances in public and private subnets.*
 * In the private subnets:
-** Two StarWind VSAN EC2 storage instances (nodes 1 and 2) in Availability Zones 1 and 3. These instances, referred to as StarWind highly available (HA) devices, provide virtualized iSCSI (internet Small Computer System Interface) storage with synchronous copies on each instance.
+** Two StarWind VSAN EC2 storage instances (nodes 1 and 2) in Availability Zones 1 and 3. These instances—referred to as StarWind highly available (HA) devices—provide virtualized iSCSI (internet Small Computer System Interface) storage with synchronous copies on each instance. These instances run on a Windows Server Failover Cluster.
 ** A StarWind VSAN EC2 witness instance (node) in Availability Zone 2. This instance monitors the storage instances to ensure quorum in case one of them fails.
 ** Two iSCSI elastic network interfaces in Availability Zones 1 and 3. These network interfaces give storage clients access to the VSAN storage.
 ** Three management network interfaces in Availability Zones 1, 2, and 3. These network interfaces give administrators management access to the instances.
