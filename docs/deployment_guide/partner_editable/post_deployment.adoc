@@ -5,26 +5,28 @@
 . Establish a Remote Desktop Protocol (RDP) connection to both StarWind VSAN EC2 storage instances and to the witness EC2 instance.
 . Open the StarWind Management Console on all three EC2 instances. Connect the instances using their management Internet Protocol addresses (IP addresses) or Domain Name System (DNS) names. 
 . Verify that the witness instance is synchronized and that its mode is set to *Witness*. 
-. Verify that both storage instances (the StarWind HA devices) have a health status of `Storage is working properly`. 
-. On both storage instances, navigate to *Disk Management* (in Windows, run `compmgmt.msc` and choose *Disk Management*). Verify that the Cluster Shared Volume (CSV) is present and healthy. For details, refer to https://docs.microsoft.com/en-us/windows-server/failover-clustering/failover-cluster-csvs[Use Cluster Shared Volumes in a failover cluster^].
+. Verify that both storage instances (nodes 1 and 2) have a health status of `Storage is working properly`. 
+. On both storage instances, navigate to Disk Management. (In Windows, run `compmgmt.msc` and choose *Disk Management*.) Verify that the replicated StarWind VSAN volume is present. It should be an additional volume with drive letter E:.
 
-=== Create and configure your Windows Server Failover Cluster
+=== (Optional) Create and configure a Windows Server Failover Cluster
+
+After you deploy this Quick Start, the {partner-product-short-name}–specific configuration is complete. Since StarWind HA storage devices are being accessed using iSCSI by both StarWind VSAN EC2 storage instances (nodes 1 and 2), data may become corrupted unless you create a failover cluster to manage the access. To create and configure a Windows Server Failover Cluster, follow these steps:
 
 . Create the failover cluster, setting the required name and static IP addresses for it. For details, refer to https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3[Creating a Failover Cluster in Windows Server^] in the StarWind VSAN technical guide.
 
-. (Optional) Add IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 storage instances (the StarWind HA devices). 
+. (Optional) Add IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 storage instances (nodes 1 and 2). 
 
-. Add the StarWind HA devices to the cluster. 
-.. In **Failover Cluster Manager**, choose *Cluster*, *Storage*, *Disks*. 
+. Add the StarWind HA devices to the cluster.
+.. In *Failover Cluster Manager*, choose *Cluster*, *Storage*, *Disks*. 
 .. In the *Actions* panel, choose *Add Disk*.
 .. Choose *StarWind disks* from the list, and verify the selection.
-.. If you are using the StarWind HA device as a CSV disk, open the context (right-click) menu for the disk, and choose *Add to Cluster Shared Volumes*.
+.. If you are using the StarWind HA device as a Cluster Shared Volume, open the context (right-click) menu for the disk, and choose *Add to Cluster Shared Volumes*.
 . Set up the failover cluster quorum by creating a Server Message Block (SMB) file share on the StarWind VSAN EC2 witness instance that will host the file-share witness for the failover cluster.
 . Add a security group rule to allow SMB access to the witness node.
 .. Open the https://console.aws.amazon.com/ec2/v2[Amazon EC2 console^], and choose *Security Groups*.
 .. Select the security group associated with the EC2 witness instance, and add a new inbound rule.
 .. Add a rule allowing port 445 Transmission Control Protocol (TCP) traffic from the security group associated with the storage instances.
-. Configure the file-share witness. 
+. Configure the file-share witness.
 .. Open the context (right-click) menu for the cluster node. Choose *More Actions*, *Configure Cluster Quorum Settings*, *Next*.
 .. Choose the quorum witness, and choose *Next*.
 .. Choose *All Nodes* (both StarWind VSAN EC2 storage instances), and choose *Next*.
