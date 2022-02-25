@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: This main template creates a multi-AZ deployment of a StarWind VSAN
   on AWS in an existing VPC. It deploys 3 StarWind VSAN EC2 instances.
-  Two nodes and a witness.
-  **WARNING** This template creates EC2 instances and related resources.
+  Two nodes and a witness. **WARNING**
+  This template creates EC2 instances and related resources.
   You will be billed for the AWS resources used if you create a stack from this template. (qs-1sgqsectt)
 Metadata:
   cfn-lint:
@@ -43,23 +43,23 @@ Metadata:
       - QSS3KeyPrefix
     ParameterLabels:
       KeyPairName:
-        default: Key pair name
+        default: Key-pair name
       VPCID:
         default: VPC ID
       PrivateSubnetAID:
-        default: Node 1 Subnet
+        default: Node 1 subnet
       PrivateSubnetBID:
-        default: Node 2 Subnet
+        default: Node 2 subnet
       PrivateSubnetCID:
-        default: Witness Subnet
+        default: Witness subnet
       RDPSGID:
-        default: RDP instance(s) security group
+        default: RDP instances security group ID
       QSS3BucketName:
         default: Quick Start S3 bucket name
       QSS3BucketRegion:
-        default: Quick Start S3 bucket region
+        default: Quick Start S3 bucket Region
       QSS3KeyPrefix:
-        default: Quick Start S3 Key Prefix
+        default: Quick Start S3 key prefix
       WorkloadInstanceType:
         default: Workload servers instance type
       SWVSANAMIOS:
@@ -67,11 +67,11 @@ Metadata:
       SWVSANStorageVolumeSize:
         default: Secondary EBS volume size
       Node1NetBiosName:
-        default: Node 1 NetBios Name
+        default: Node 1 NetBIOS name
       Node2NetBiosName:
-        default: Node 2 NetBios Name
+        default: Node 2 NetBIOS name
       WitnessNodeNetBiosName:
-        default: Witness Node NetBios Name
+        default: Witness node NetBIOS name
 Parameters:
   KeyPairName:
     Description: Name of an existing EC2 key pair. The instance will launch with
@@ -81,42 +81,54 @@ Parameters:
     Description: ID of your existing VPC for deployment.
     Type: AWS::EC2::VPC::Id
   PrivateSubnetAID:
-    Description: ID of private subnet in Availability Zone 1
+    Description: ID of private subnet in Availability Zone 1.
       for the first node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnetBID:
-    Description: ID of private subnet in Availability Zone 2
+    Description: ID of private subnet in Availability Zone 2.
       for the second node (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnetCID:
-    Description: ID of private subnet in Availability Zone 3
+    Description: ID of private subnet in Availability Zone 3.
       for the witness (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   RDPSGID:
-    Description: ID of your Remote Desktop instance(s) security group.
+    Description: ID of the security group for your Remote Desktop instances.
     Type: AWS::EC2::SecurityGroup::Id
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
-      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
-      (-).
+    ConstraintDescription: The Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a 
+      hyphen (-).
     Default: aws-quickstart
-    Description: S3 bucket name for the Quick Start assets. This string can include
-      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
-      or end with a hyphen (-).
+    Description: Name of the S3 bucket for your copy of the Quick Start assets. 
+      Keep the default name unless you are customizing the template. 
+      Changing the name updates code references to point to a new Quick 
+      Start location. This name can include numbers, lowercase letters, 
+      uppercase letters, and hyphens, but do not start or end with a hyphen (-). 
+      See https://aws-quickstart.github.io/option1.html.
     Type: String
   QSS3BucketRegion:
     Default: 'us-east-1'
-    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
+    Description: 'AWS Region where the Quick Start S3 bucket (QSS3BucketName) is 
+    hosted. Keep the default Region unless you are customizing the template. 
+    Changing this Region updates code references to point to a new Quick Start location. 
+    When using your own bucket, specify the Region. 
+    See https://aws-quickstart.github.io/option1.html.'
     Type: String
   QSS3KeyPrefix:
     AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slash (/).
+    ConstraintDescription: The Quick Start S3 key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slashes (/). The prefix should
+      end with a forward slash (/).
     Default: quickstart-examples/
-    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
-      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
-      forward slash (/).
+    Description: S3 key prefix that is used to simulate a folder for your copy of the 
+      Quick Start assets. Keep the default prefix unless you are customizing 
+      the template. Changing this prefix updates code references to point to 
+      a new Quick Start location. This prefix can include numbers, lowercase 
+      letters, uppercase letters, hyphens (-), and forward slashes (/). End with 
+      a forward slash. See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html 
+      and https://aws-quickstart.github.io/option1.html.
     Type: String
   WorkloadInstanceType:
     AllowedValues:
@@ -281,7 +293,7 @@ Parameters:
     ConstraintDescription: Must be between 1 GB and 16,000 GB (16 TB).
     MinValue: 1
     MaxValue: 16000
-    Description: Size for SarWind VSAN virtualized storage in GBs.
+    Description: Size (in GB) for StarWind VSAN virtualized storage.
   Node1NetBiosName:
     AllowedPattern: '[a-zA-Z0-9\-]+'
     Default: "SWVSANNODE1"
@@ -330,7 +342,7 @@ Resources:
         parameters:
           StackName:
             type: String
-            description: The CloudFormation Stack name this automation belongs to.
+            description: The CloudFormation stack name this automation belongs to
           Node1Name:
             type: String
             description: NetBIOS name for storage node 1
@@ -343,8 +355,8 @@ Resources:
           AutomationAssumeRole:
             type: String
             description: |-
-              (Optional) The ARN of the role that allows Automation to perform
-                    the actions on your behalf.
+              (Optional) The ARN of the role that allows automation to perform
+                    the actions on your behalf
         mainSteps:
           - name: "swvsanNode1InstanceId"
             action: aws:executeAwsApi
@@ -990,23 +1002,23 @@ Resources:
         ParentStackName: !Sub ${AWS::StackName}
 Outputs:
   StorageNode1ManagementIP:
-    Description: Management IP Address of Storage Node 1
+    Description: Management IP address of storage node 1
     Value: !GetAtt StorageNode1Stack.Outputs.SWVSANEC2InstanceManagementIP
   StorageNode1IscsiIP:
-    Description: iSCSI IP Address of Storage Node 1
+    Description: iSCSI IP address of storage node 1
     Value: !GetAtt StorageNode1Stack.Outputs.SWVSANEC2InstanceIscsiIP
   StorageNode1SyncronizationIP:
-    Description: Syncronization IP Address of Storage Node 1
+    Description: Synchronization IP address of storage node 1
     Value: !GetAtt StorageNode1Stack.Outputs.SWVSANEC2InstanceSyncronizationIP
   StorageNode2ManagementIP:
-    Description: Management IP Address of Storage Node 2
+    Description: Management IP address of storage node 2
     Value: !GetAtt StorageNode2Stack.Outputs.SWVSANEC2InstanceManagementIP
   StorageNode2IscsiIP:
-    Description: iSCSI IP Address of Storage Node 2
+    Description: iSCSI IP address of storage node 2
     Value: !GetAtt StorageNode2Stack.Outputs.SWVSANEC2InstanceIscsiIP
   StorageNode2SyncronizationIP:
-    Description: Syncronization IP Address of Storage Node 2
+    Description: Synchronization IP address of storage node 2
     Value: !GetAtt StorageNode2Stack.Outputs.SWVSANEC2InstanceSyncronizationIP
   WitnessNodeManagementIP:
-    Description: Management IP Address of Witness Node
+    Description: Management IP address of witness node
     Value: !GetAtt WitnessNodeStack.Outputs.SWVSANEC2InstanceManagementIP
