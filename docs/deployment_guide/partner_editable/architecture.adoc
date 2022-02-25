@@ -4,7 +4,7 @@ Deploying this Quick Start with default parameters builds the following {partner
 AWS Cloud.
 
 [#architecture1]
-.Quick Start architecture for {partner-product-short-name} on AWS test
+.Quick Start architecture for {partner-product-short-name} on AWS
 image::../docs/deployment_guide/images/starwind_qs_architecture_diagram.png[Architecture]
 
 As shown in <<architecture1>>, the Quick Start sets up the following:
@@ -18,10 +18,10 @@ internet access for resources in the private subnets.*
 ** A Windows bastion host in an Auto Scaling group to allow inbound secure
 Remote Desktop Gateway (RD Gateway) access to Amazon Elastic Compute Cloud (Amazon EC2) instances in public and private subnets.*
 * In the private subnets:
-** Two StarWind VSAN EC2 storage instances (nodes 1 and 2) in Availability Zones 1 and 3. These instances—referred to as StarWind highly available (HA) devices—provide virtualized iSCSI (Internet Small Computer System Interface) storage with synchronous copies on each instance. These instances run on a Windows Server Failover Cluster.
+** Two StarWind VSAN EC2 storage instances (nodes 1 and 2) in Availability Zones 1 and 3. These instances provide the StarWind highly available (HA) storage devices, which are stored as a synchronous copy on each instance's D: volume. The instances can be accessed using iSCSI (Internet Small Computer System Interface) as virtualized HA block storage. 
 ** A StarWind VSAN EC2 witness instance (node) in Availability Zone 2. This instance monitors the storage instances to ensure quorum in case one of them fails.
-** Two iSCSI elastic network interfaces in Availability Zones 1 and 3. These network interfaces give storage clients access to the VSAN storage.
-** Three management network interfaces in Availability Zones 1, 2, and 3. These network interfaces give administrators management access to the instances.
+** Two iSCSI elastic network interfaces in Availability Zones 1 and 3. These network interfaces give storage clients access to the VSAN storage (StarWind HA devices).
+** Three management network interfaces in Availability Zones 1, 2, and 3. These network interfaces give administrators management access to the instances and support witness traffic between all nodes.
 ** Two synchronization network interfaces in Availability Zones 1 and 3. These network interfaces replicate the storage on the StarWind VSAN storage instances.
 
 [.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
