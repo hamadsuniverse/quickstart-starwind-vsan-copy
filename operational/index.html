@@ -5,9 +5,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.17">
-<meta name="description" content="StarWind Virtual SAN (VSAN) Deployment Guide on AWS">
+<meta name="description" content="StarWind Virtual SAN (VSAN) Operational Guide on AWS">
 <meta name="keywords" content="Quick Start, AWS, StarWind Virtual SAN (VSAN)">
-<title>StarWind Virtual SAN (VSAN) on the AWS Cloud</title>
+<title>StarWind Virtual SAN (VSAN) on the AWS Cloud - Operational Guide</title>
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 /* Uncomment @import statement to use as custom stylesheet */
@@ -835,18 +835,10 @@ p.footer-text a{color:#d7d8d8}
 <div id="toctitle"></div>
 <ul class="sectlevel1">
 <li><a href="#_overview">Overview</a></li>
-<li><a href="#_costs_and_licenses">Costs and licenses</a></li>
-<li><a href="#_architecture">Architecture</a></li>
-<li><a href="#_deployment_options">Deployment options</a></li>
-<li><a href="#_predeployment_steps">Predeployment steps</a></li>
-<li><a href="#_deployment_steps">Deployment steps</a></li>
-<li><a href="#_postdeployment_steps">Postdeployment steps</a>
-<ul class="sectlevel2">
-<li><a href="#_test_the_deployment">Test the deployment</a></li>
-<li><a href="#_optional_create_and_configure_a_windows_server_failover_cluster">(Optional) Create and configure a Windows Server Failover Cluster</a></li>
-</ul>
-</li>
-<li><a href="#_troubleshooting">Troubleshooting</a></li>
+<li><a href="#_failover_cluster_simple_testing">Failover Cluster simple testing</a></li>
+<li><a href="#_best_practices_for_using_starwind_vsan_on_aws">Best practices for using StarWind VSAN on AWS</a></li>
+<li><a href="#_security">Security</a></li>
+<li><a href="#_optional_connect_other_ec2_instances_to_the_starwind_ha_storage">(Optional) Connect other EC2 instances to the StarWind HA storage</a></li>
 <li><a href="#_feedback">Feedback</a></li>
 <li><a href="#_notices">Notices</a></li>
 </ul>
@@ -856,22 +848,19 @@ p.footer-text a{color:#d7d8d8}
 <div id="preamble">
 <div class="sectionbody">
 <h2 id="_starwind_virtual_san_vsan_on_the_aws_cloud" class="discrete text-center">StarWind Virtual SAN (VSAN) on the AWS Cloud</h2>
-<h2 id="_quick_start_deployment_guide" class="discrete text-left text-center">Quick Start deployment guide</h2>
+<h2 id="_quick_start_operational_guide" class="discrete text-left text-center">Quick Start Operational Guide</h2>
 <div class="imageblock text-center">
 <div class="content">
-<img src="https://aws-quickstart.s3.amazonaws.com/docs/deployment-guide/aws-quickstart-deployment-graphic.png" alt="QS" width="80" height="80">
+<img src="https://aws-quickstart.s3.amazonaws.com/docs/operational-guide/aws-quickstart-operational-graphic.png" alt="QS" width="80" height="80">
 </div>
 </div>
 <div class="imageblock image-container">
 <div class="content">
-<img src="https://aws-quickstart.s3.amazonaws.com/quickstart-starwind-vsan/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="">
+<img src="https://aws-quickstart.s3.amazonaws.com/quickstart-starwind-vsan/docs/boilerplate/.images/aws-quickstart-operational-graphic.png" alt="">
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>March 2022</strong><br>
-<em>Orest Lesyuk, StarWind Software Inc.</em><br>
-<em>Hamad Alkhal, AWS Professional Services team</em><br>
-<em>Dave May, AWS Integration &amp; Automation team</em><br></p>
+<p><strong>February 2022</strong><br></p>
 </div>
 <div class="admonitionblock tip text-left">
 <table>
@@ -880,7 +869,7 @@ p.footer-text a{color:#d7d8d8}
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-See the <a href="https://github.com/aws-quickstart/quickstart-starwind-vsan" target="_blank" rel="noopener">GitHub repository</a> to view source files, report bugs, submit feature ideas, and post feedback about this Quick Start. To comment on the documentation, see <a href="#_feedback">Feedback</a>.
+Visit our <a href="https://github.com/aws-quickstart/quickstart-starwind-vsan" target="_blank" rel="noopener">GitHub repository</a> to view source files, report bugs, submit feature ideas, and post feedback about this Quick Start. To comment on the documentation, see <a href="#_feedback">Feedback</a>.
 </td>
 </tr>
 </table>
@@ -893,309 +882,57 @@ See the <a href="https://github.com/aws-quickstart/quickstart-starwind-vsan" tar
 <div class="sect1">
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>This Quick Start deploys StarWind Virtual SAN (VSAN)—a virtual storage area network—on the AWS Cloud. For more information, refer to
-<a href="https://www.starwindsoftware.com/technical_papers/getting-started.pdf" target="_blank" rel="noopener">StarWind Virtual SAN Getting Started</a>.</p>
-</div>
-<div class="paragraph">
-<p>If you are unfamiliar with AWS Quick Starts, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a>.</p>
-</div>
+
 </div>
 </div>
 <div class="sect1">
-<h2 id="_costs_and_licenses">Costs and licenses</h2>
+<h2 id="_failover_cluster_simple_testing">Failover Cluster simple testing</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Quick Start requires a subscription to the Amazon Machine Image (AMI) for StarWind VSAN, which is available from <a href="https://aws.amazon.com/marketplace/" target="_blank" rel="noopener">AWS Marketplace</a>. Additional pricing, terms, and conditions may apply.</p>
-</div>
-<div class="paragraph">
-<p>There is no other cost to use this Quick Start, but you will be billed for the resources deployed. For more information refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_architecture">Architecture</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Deploying this Quick Start with default parameters builds the following StarWind VSAN environment in the
-AWS Cloud.</p>
-</div>
-<div id="architecture1" class="imageblock">
-<div class="content">
-<img src="docs/deployment_guide/images/starwind_qs_architecture_diagram.png" alt="Architecture">
-</div>
-<div class="title">Figure 1. Quick Start architecture for StarWind VSAN on AWS</div>
-</div>
-<div class="paragraph">
-<p>As shown in <a href="#architecture1">Figure 1</a>, the Quick Start sets up the following:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>A highly available architecture that spans three Availability Zones.</p>
-</li>
-<li>
-<p>A virtual private cloud (VPC) configured with public and private subnets, according to AWS
-best practices, to provide you with your own virtual network on AWS.*</p>
-</li>
-<li>
-<p>In the public subnets:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Managed network address translation (NAT) gateways to allow outbound
-internet access for resources in the private subnets.*</p>
-</li>
-<li>
-<p>A Windows bastion host in an Auto Scaling group to allow inbound secure
-Remote Desktop Gateway (RD Gateway) access to Amazon Elastic Compute Cloud (Amazon EC2) instances in public and private subnets.*</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>In the private subnets:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Two StarWind VSAN EC2 storage instances (nodes 1 and 2) in Availability Zones 1 and 3. These instances provide the StarWind highly available (HA) storage devices, which are stored as a synchronous copy on each instance&#8217;s D: volume.</p>
-</li>
-<li>
-<p>A StarWind VSAN EC2 witness instance (node) in Availability Zone 2. This instance monitors the storage instances to ensure quorum in case one of them fails.</p>
-</li>
-<li>
-<p>Two iSCSI (Internet Small Computer System Interface) elastic network interfaces in Availability Zones 1 and 3. These network interfaces give storage clients access to the VSAN storage (StarWind HA devices).</p>
-</li>
-<li>
-<p>Three management network interfaces in Availability Zones 1, 2, and 3. These network interfaces give administrators management access to the instances and support witness traffic between all nodes.</p>
-</li>
-<li>
-<p>Two synchronization network interfaces in Availability Zones 1 and 3. These network interfaces replicate the storage on the StarWind VSAN storage instances.</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p><span class="small">* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.</span></p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_deployment_options">Deployment options</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This Quick Start provides the following deployment options:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://fwd.aws/XAGxj?" target="_blank" rel="noopener">Deploy StarWind VSAN into a new VPC</a>. This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys StarWind VSAN into this new VPC.</p>
-</li>
-<li>
-<p><a href="https://fwd.aws/5emvY?" target="_blank" rel="noopener">Deploy StarWind VSAN into an existing VPC</a>. This option provisions StarWind VSAN in your existing AWS infrastructure.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>This Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and StarWind VSAN settings.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_predeployment_steps">Predeployment steps</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This Quick Start requires a subscription to the AMI for StarWind VSAN in AWS Marketplace.</p>
+<p>The following tests can be performed to confirm that the Failover Cluster is operating properly:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Sign in to your AWS account.</p>
+<p>In case StarWind HA device is used as a cluster shared volume (CSV), create a test VM (can be created without OS), place it on StarWind HA CSV and make sure the VM is able to live migrate.</p>
 </li>
 <li>
-<p>Open the page for the StarWind VSAN AMI that matches your operating system requirement.</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://aws.amazon.com/marketplace/pp/prodview-j6vmh577hzixu?sr=0-4&amp;ref_=beagle&amp;applicationId=AWSMPContessa" target="_blank" rel="noopener">StarWind Virtual SAN on Windows Server 2019</a></p>
-</li>
-<li>
-<p><a href="https://aws.amazon.com/marketplace/pp/prodview-sr2ikwn6wo4gw?sr=0-1&amp;ref_=beagle&amp;applicationId=AWSMPContessa" target="_blank" rel="noopener">StarWind Virtual SAN on Windows Server 2016</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Choose <strong>Continue to Subscribe</strong>.</p>
+<p>Shut down one of the StarWind VSAN EC2 Storage instances and make sure that a test VM or role is able to failover to a partner instance. To perform this, follow the steps described in <a href="https://knowledgebase.starwindsoftware.com/maintenance/how-to-restartshutdown-servers-with-starwind-vsan-installed/">How to restart/shutdown servers with StarWind VSAN installed</a>.</p>
 </li>
 </ol>
+</div>
+<div class="paragraph">
+<p>Make sure that the tests above are successful for both StarWind VSAN EC2 Storage instances.</p>
+</div>
+<div class="paragraph">
+<p>Once the tests above have passed successfully, you can deploy your required application, role or VM and proceed with workload testing. This can include live migration, failover and general operation and performance tests.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_deployment_steps">Deployment steps</h2>
+<h2 id="_best_practices_for_using_starwind_vsan_on_aws">Best practices for using StarWind VSAN on AWS</h2>
 <div class="sectionbody">
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Sign in to your AWS account, and launch a deployment option, as described under <a href="#_deployment_options">Deployment options</a>. The <a href="https://console.aws.amazon.com/cloudformation" target="_blank" rel="noopener">AWS CloudFormation console</a> opens with a prepopulated template. Each deployment option takes about 25 minutes to complete.</p>
-</li>
-<li>
-<p>Ensure that you are in the correct Region, and choose <strong>Next</strong> to enter parameter values.</p>
-</li>
-<li>
-<p>On the <strong>Create stack</strong> page, keep the default setting for the template URL, and then choose <strong>Next</strong>.</p>
-</li>
-<li>
-<p>On the <strong>Specify stack details</strong> page, change the stack name if needed. Review the parameters for the template. Provide values for the parameters that require input. For all other parameters, review the default settings and customize them as necessary. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Unless you are customizing the Quick Start templates for your own projects, don&#8217;t change the default settings for the parameters <strong>Quick Start S3 bucket name</strong>, <strong>Quick Start S3 bucket Region</strong>, and <strong>Quick Start S3 key prefix</strong>. Changing these settings automatically updates code references to point to a new Quick Start location. For more information, see the <a href="https://aws-quickstart.github.io/option1.html" target="_blank" rel="noopener">AWS Quick Start Contributor’s Guide</a>.
-</td>
-</tr>
-</table>
-</div>
-</li>
-<li>
-<p>On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you finish, choose <strong>Next</strong>.</p>
-</li>
-<li>
-<p>On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources that might require the ability to automatically expand macros.</p>
-</li>
-<li>
-<p>Choose <strong>Create stack</strong> to deploy the stack.</p>
-</li>
-<li>
-<p>Monitor the stack&#8217;s status, and when the status is <strong>CREATE_COMPLETE</strong>, the StarWind Virtual SAN (VSAN) deployment is ready.</p>
-</li>
-<li>
-<p>To view the created resources, choose the <strong>Outputs</strong> tab.</p>
-</li>
-</ol>
+<div class="paragraph">
+<p>With limited control access to the hardware in cloud environments, it is recommended to create StarWind HA devices with Node Majority failover strategy which eliminates the risk of Split Brain in case of network connectivity loss between StarWind VSAN EC2 Storage instances and allows withstanding a StarWind VSAN EC2 instance failure. This QuickStart follows this best practice. For more information, see <a href="https://www.starwindsoftware.com/resource-library/starwind-witness-node/">StarWind Witness</a>.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_postdeployment_steps">Postdeployment steps</h2>
+<h2 id="_security">Security</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_test_the_deployment">Test the deployment</h3>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Establish a Remote Desktop Protocol (RDP) connection to both StarWind VSAN EC2 storage instances and to the witness EC2 instance.</p>
-</li>
-<li>
-<p>Open the StarWind Management Console on all three EC2 instances. Connect the instances using their management Internet Protocol addresses (IP addresses) or Domain Name System (DNS) names.</p>
-</li>
-<li>
-<p>Verify that the witness instance is synchronized and that its mode is set to <strong>Witness</strong>.</p>
-</li>
-<li>
-<p>Verify that both storage instances (nodes 1 and 2) have a health status of <code>Storage is working properly</code>.</p>
-</li>
-<li>
-<p>On both storage instances, navigate to Disk Management. (In Windows, run <code>compmgmt.msc</code> and choose <strong>Disk Management</strong>.) Verify that the replicated StarWind VSAN volume is present. It should be an additional volume with drive letter E:.</p>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_optional_create_and_configure_a_windows_server_failover_cluster">(Optional) Create and configure a Windows Server Failover Cluster</h3>
 <div class="paragraph">
-<p>After you deploy this Quick Start, the StarWind VSAN–specific configuration is complete. Since StarWind HA storage devices are accessed using iSCSI by both StarWind VSAN EC2 storage instances (nodes 1 and 2), data may become corrupted unless you create a failover cluster to manage the access. To create and configure a Windows Server Failover Cluster, follow these steps:</p>
+<p>It is recommended not to backup the StarWind EC2 instances themselves but only data or workloads running on top of them. In case it is required to backup a StarWind VSAN EC2 instance, <a href="https://www.starwindsoftware.com/help/MaintenanceMode.html">maintenance mode</a> must be enabled.</p>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Create the failover cluster, setting the required name and static IP addresses for it. For details, refer to <a href="https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3" target="_blank" rel="noopener">Creating a Failover Cluster in Windows Server</a> in the StarWind VSAN technical guide.</p>
-</li>
-<li>
-<p>(Optional) Add IP addresses needed for the cluster and its resources as secondary private IP addresses on the management network interface of the StarWind VSAN EC2 storage instances (nodes 1 and 2).</p>
-</li>
-<li>
-<p>Add the StarWind HA devices to the cluster.</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>In <strong>Failover Cluster Manager</strong>, choose <strong>Cluster</strong>, <strong>Storage</strong>, <strong>Disks</strong>.</p>
-</li>
-<li>
-<p>In the <strong>Actions</strong> panel, choose <strong>Add Disk</strong>.</p>
-</li>
-<li>
-<p>Choose <strong>StarWind disks</strong> from the list, and verify the selection.</p>
-</li>
-<li>
-<p>If you are using the StarWind HA device as a Cluster Shared Volume, open the context (right-click) menu for the disk, and choose <strong>Add to Cluster Shared Volumes</strong>.</p>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>Set up the failover cluster quorum by creating a Server Message Block (SMB) file share on the StarWind VSAN EC2 witness instance that will host the file-share witness for the failover cluster.</p>
-</li>
-<li>
-<p>Add a security group rule to allow SMB access to the witness node.</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Open the <a href="https://console.aws.amazon.com/ec2/v2" target="_blank" rel="noopener">Amazon EC2 console</a>, and choose <strong>Security Groups</strong>.</p>
-</li>
-<li>
-<p>Select the security group associated with the EC2 witness instance, and add a new inbound rule.</p>
-</li>
-<li>
-<p>Add a rule allowing port 445 Transmission Control Protocol (TCP) traffic from the security group associated with the storage instances.</p>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>Configure the file-share witness.</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Open the context (right-click) menu for the cluster node. Choose <strong>More Actions</strong>, <strong>Configure Cluster Quorum Settings</strong>, <strong>Next</strong>.</p>
-</li>
-<li>
-<p>Choose the quorum witness, and choose <strong>Next</strong>.</p>
-</li>
-<li>
-<p>Choose <strong>All Nodes</strong> (both StarWind VSAN EC2 storage instances), and choose <strong>Next</strong>.</p>
-</li>
-<li>
-<p>Choose <strong>Configure a file share witness</strong>, and choose <strong>Next</strong>.</p>
-</li>
-<li>
-<p>In the <strong>File Share Path</strong> box, enter the share path, and choose <strong>Next</strong>.</p>
-</li>
-<li>
-<p>Review the summary page. Then choose <strong>Finish</strong>.</p>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
+<div class="paragraph">
+<p>For additional information on backups, please refer to <a href="https://www.starwindsoftware.com/best-practices/starwind-virtual-san-backup-best-practices/">StarWind VSAN Backup Best Practices</a>.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_troubleshooting">Troubleshooting</h2>
+<h2 id="_optional_connect_other_ec2_instances_to_the_starwind_ha_storage">(Optional) Connect other EC2 instances to the StarWind HA storage</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>For troubleshooting common Quick Start issues, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a>.</p>
-</div>
-<div class="paragraph">
-<p>After you successfully deploy a Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/" target="_blank" rel="noopener">Shared Responsibility Model</a>.</p>
+<p>To connect other EC2 instances to the StarWind HA storage, add a separate network interface for storage discovery using iSCSI on each additional EC2 instance. Use this network interface to connect storage from StarWind VSAN EC2 storage instances. Direct each storage connection—whether it originates from a separate iSCSI network interface or the default network interface—toward the StarWind VSAN EC2 storage instances' iSCSI network interface. You can identify the correct network interface from its description in the AWS Console.</p>
 </div>
 </div>
 </div>
@@ -1245,12 +982,3 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 </footer>
 </body>
 </html>
-<!--
-repo commit:
-446caca28177a2afa41e5b6a9660c7358c109537
-
-submodule config:
- 481fa42d834a41ddc2700203a47b76830008af1b docs/boilerplate (heads/main)
- b7aefd089e944d77cdc2b083886cdc498d2a6ee4 submodules/quickstart-aws-vpc (v1.0-59-gb7aefd0)
- f282fbb4e807dd4b4044244361d260c4f206bf0c submodules/quickstart-microsoft-rdgateway (remotes/origin/develop)
--->
