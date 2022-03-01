@@ -3,7 +3,7 @@
 :partner-product-name: StarWind Virtual SAN (VSAN)
 :partner-product-short-name: StarWind VSAN
 :partner-company-name: StarWind Software Inc.
-:doc-month: February
+:doc-month: March
 :doc-year: 2022
 :partner-contributors: Orest Lesyuk, {partner-company-name}
 //:other-contributors: Akua Mansa, Trek10

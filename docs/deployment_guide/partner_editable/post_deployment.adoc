@@ -10,7 +10,7 @@
 
 === (Optional) Create and configure a Windows Server Failover Cluster
 
-After you deploy this Quick Start, the {partner-product-short-name}–specific configuration is complete. Since StarWind HA storage devices are being accessed using iSCSI by both StarWind VSAN EC2 storage instances (nodes 1 and 2), data may become corrupted unless you create a failover cluster to manage the access. To create and configure a Windows Server Failover Cluster, follow these steps:
+After you deploy this Quick Start, the {partner-product-short-name}–specific configuration is complete. Since StarWind HA storage devices are accessed using iSCSI by both StarWind VSAN EC2 storage instances (nodes 1 and 2), data may become corrupted unless you create a failover cluster to manage the access. To create and configure a Windows Server Failover Cluster, follow these steps:
 
 . Create the failover cluster, setting the required name and static IP addresses for it. For details, refer to https://www.starwindsoftware.com/resource-library/starwind-virtual-san-for-hyper-v-2-node-hyperconverged-scenario-with-windows-server-2016/#14bdf4cea7ba8ca523dcfb621c1969fa624feec3[Creating a Failover Cluster in Windows Server^] in the StarWind VSAN technical guide.
 

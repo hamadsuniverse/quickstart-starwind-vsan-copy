@@ -1,4 +1,4 @@
 This Quick Start deploys {partner-product-name}—a virtual storage area network—on the AWS Cloud. For more information, refer to 
 https://www.starwindsoftware.com/technical_papers/getting-started.pdf[StarWind Virtual SAN Getting Started^].
 
-If you are unfamiliar with AWS Quick Starts, refer to the https://aws-ia.github.io/content/qs_info.html[AWS Quick Start General Content Guide^].
+If you are unfamiliar with AWS Quick Starts, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^].
