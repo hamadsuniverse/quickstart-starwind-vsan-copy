@@ -132,6 +132,19 @@ Parameters:
     Type: String
   WorkloadInstanceType:
     AllowedValues:
+    - c6i.12xlarge
+    - c6i.16xlarge
+    - c6i.24xlarge
+    - c6i.32xlarge
+    - c6i.2xlarge
+    - c6i.4xlarge
+    - c6i.8xlarge
+    - c6i.metal
+    - c6id.16xlarge
+    - c6id.32xlarge
+    - c6id.2xlarge
+    - c6id.4xlarge
+    - c6id.8xlarge
     - c5.12xlarge
     - c5.18xlarge
     - c5.24xlarge
