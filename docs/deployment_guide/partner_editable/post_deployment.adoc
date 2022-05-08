@@ -6,7 +6,7 @@
 . Open the StarWind Management Console on all three EC2 instances. Connect the instances using their management Internet Protocol addresses (IP addresses) or Domain Name System (DNS) names. 
 . Verify that the witness instance is synchronized and that its mode is set to *Witness*. 
 . Verify that both storage instances (nodes 1 and 2) have a health status of `Storage is working properly`. 
-. On both storage instances, navigate to Disk Management. (In Windows, run `compmgmt.msc` and choose *Disk Management*.) Verify that the replicated StarWind VSAN volume is present. It should be an additional volume with drive letter E:.
+. On both storage instances, navigate to Disk Management. (In Windows, run `compmgmt.msc` and choose *Disk Management*.) Verify that the replicated StarWind VSAN volume is present. It should be an additional volume named CSV.
 
 === (Optional) Create and configure a Windows Server Failover Cluster
 
